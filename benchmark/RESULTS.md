@@ -97,9 +97,28 @@ On answer + thinking quality, the skill is a **reasoning amplifier, not a coding
 
 ---
 
+## Local reproducibility — a second trial (the n=1 warning, demonstrated)
+
+I re-ran the four local models (same task, same rubric). Scores swung hard between identical runs — direct evidence that single-trial local numbers are mostly noise:
+
+| Local model | Trial 1 (no→with, Δ) | Trial 2 (no→with, Δ) | 2-trial avg Δ |
+|---|:---:|:---:|:---:|
+| llama3:8b | 8→27 (+19) | 8→22 (+14) | **+16** |
+| gemma3:4b | 50→38 (**−12**) | 18→60 (**+42**) | **+15** |
+| qwen2.5:7b | 44→54 (+10) | 32→55 (+23) | **+16** |
+| qwen3.6 | 82→87 (+5) | 82→70 (−12) | **−4** |
+
+- **Single-trial local Δ is dominated by variance.** gemma3:4b swung from −12 to +42 between identical runs; qwen3.6 from +5 to −12. Trial 1's gemma3 −12 (flagged as an artifact) is **confirmed noise**.
+- **The *no-skill* arm is the noisy one.** With-skill scores are relatively stable (gemma3 38/60, qwen2.5 54/55); the no-skill draws swing (gemma3 50 vs 18) — a weak model randomly either lands on the common correct pattern or improvises a broken one.
+- **Averaged (n=2), the mid-tier locals are net positive** (+15 to +16) — the skill helps them on average — while the strongest local (qwen3.6) is a wash-to-slightly-negative (−4): with the skill it sometimes picks a simpler fixed-window (no lock) instead of its own unaided sliding-window, so it has nothing to gain.
+
+**Don't trust any single local Δ.** Cloud models weren't re-run — treat their deltas as single-trial too. Real conclusions need n ≥ 3.
+
+---
+
 ## Limitations
 
-- **n = 1 task, single trial.** No repeats, no error bars. **gemma3:4b's −12 is the proof**: it comes from its unaided run happening to produce correct code this time, not from the skill "hurting." Treat any single Δ under ~10 as noise.
+- **n = 1 for cloud; n = 2 for local (see reproducibility above).** Local Δs swing wildly run-to-run (gemma3:4b: −12 then +42), **confirming** single-trial numbers are mostly noise. Treat any single Δ — cloud or local — as directional only; real conclusions need n ≥ 3.
 - **Self-judged.** Scoring was done by one of the contestant models (Opus 4.8), a bias risk — especially the Opus row.
 - **One-shot autonomous tests only one slice of the skill.** The interactive moves — *interview me*, *blind-spot pass over a real codebase*, *N variants*, *quiz-back before merge* — do not fire in a single autonomous shot.
 - **Single task domain** (rate limiting). Results may not transfer.
