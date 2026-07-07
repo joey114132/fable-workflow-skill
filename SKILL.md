@@ -37,7 +37,8 @@ codebase and constraints are the *territory*. Every place the model hits territo
 didn't cover is an **unknown** — an unspecified decision point. A capable model hits MANY of
 these because it explores widely. Left alone it silently guesses; each silent guess is a
 place the result can drift from what the user wanted. So: **surface unknowns first, decide
-them explicitly, then build.**
+them explicitly, then build.** This holds in any field — a vague research question, an
+ambiguous design brief, or an underspecified analysis each hide the same unspecified decisions.
 
 ## The loop
 
@@ -69,7 +70,13 @@ the bottom row into the light (`prompts.md` has copy-paste versions):
 While building, **log every unknown it hits** and the choice it made (an "assumptions /
 implementation notes" list). That's your audit trail of where map and territory diverged.
 
-### 4. Stay in the loop — verify you still own it
+### 4. Verify — make it real, don't just assert it
+Before calling it done, **exercise the result** — good reasoning does not guarantee a good
+answer. Code: run it, or write the smallest check that fails if the logic breaks, and look at
+the output. Research/analysis: test the key claim against a source. Design/writing: put it in
+front of the real context. This is the step that turns a sound *plan* into a correct *result*.
+
+### 5. Stay in the loop — keep owning it
 Before merging/PR, have the model **quiz you** on what changed, so you can actually represent
 the work. Building is now cheap; **generating value is still the hard part** — staying in the
 loop is how you keep steering toward value instead of just shipping motion.
@@ -81,6 +88,8 @@ loop is how you keep steering toward value instead of just shipping motion.
 - Enumeration / counting / precise lookup → **script it**, don't recall it.
 - Taste/subjective call → **offer variants**, don't pick one and hope.
 - Always end a build with a **logged assumptions list** and (interactively) a quiz-back.
+- **Verify the result, don't assert it** — run / check / drive the output before calling it done.
+  A good plan is not a correct answer (see Gotchas).
 - One-shot / autonomous (can't ask)? Still surface the unknowns as a written list, pick
   sensible defaults, and log them — the surfacing is the point, not the asking.
 
@@ -97,6 +106,9 @@ loop is how you keep steering toward value instead of just shipping motion.
   near-identical options give the human nothing to react to.
 - **Logging assumptions is not optional cover.** It's the artifact that lets the human catch
   a wrong guess *before* it ships. An unlogged assumption is a silent bet.
+- **A surfaced plan is not a verified answer.** The method's real limit: it reliably improves
+  *reasoning*, but reasoning ≠ a correct result — especially for code. Don't stop at a great
+  UNKNOWNS list and confident prose; **step 4 (verify) is mandatory** — exercise the output.
 - **Weak/small models (≤ ~8B) need the lite variant.** The full "surface all unknowns, then
   derive the code" prompt crowds a small model's capacity and *degrades* its implementation —
   it reasons more but codes worse. For those, cap unknowns at 2–3 and anchor with a **reference

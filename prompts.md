@@ -33,6 +33,11 @@ New-domain variant:
 > you hit something my spec didn't cover (an unknown), record it and the choice you made.
 > Show the list with the result.
 
+## Verify — make it real (before you call it done)
+> Don't assert it works — **exercise it.** Code: run it, or write the smallest check that fails
+> if the logic breaks, and show the output. Research/analysis: verify the key claim against a
+> source. Design/doc: put it in the real context and show how it holds up.
+
 ## Quiz me (stay in the loop before merge)
 > Before I open the PR, **quiz me** on what changed and why — the decisions I'd need to
 > defend in review. Flag anything I get wrong or can't explain.

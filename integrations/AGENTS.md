@@ -23,7 +23,8 @@ it silently. Surface it first, then build.
    - **Variants** — for taste calls (design, output format, API shape), offer **N genuinely different** options to react to, not one.
    - **References as maps** — prefer an example/mockup over a written spec ("build in the spirit of this").
 3. **Build, logging deviations** — keep a running **ASSUMPTIONS / NOTES** list of every unknown hit and the choice made.
-4. **Stay in the loop** — **quiz the human** before merge so they still own the work.
+4. **Verify — make it real** — exercise the result before calling it done (code: run it / smallest check; research: verify the claim against a source). A good plan is not a correct answer.
+5. **Stay in the loop** — **quiz the human** before merge so they still own the work.
 
 ## Rules
 - Vague spec / unfamiliar territory → find the unknowns **before** implementing. Don't build the first interpretation silently.
