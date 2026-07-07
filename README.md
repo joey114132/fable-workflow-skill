@@ -76,7 +76,7 @@ All adapters and per-tool details: [`integrations/`](integrations/).
 
 Advice is easy to skip. Installed as a plugin, `fable-workflow` also **enforces** the method with hooks (`hooks/`):
 
-- **`UserPromptSubmit` → inject** — on a non-trivial task the method is injected into context automatically (deterministic activation, not "hope the model triggers it").
+- **`UserPromptSubmit` → inject** — on a non-trivial task it injects **one task-matched line** (the smallest matching discipline: investigate · completion-gate · verify · surface-unknowns), ~25 tokens — deterministic activation, not a fixed blob or "hope the model triggers it".
 - **`Stop` → verify gate** — if the session edited code but never ran it, the Verify step was skipped. **Advisory by default**; set `FABLE_STRICT=1` to **block** the stop until it's verified.
 - **Completion gate** (`scripts/goals.py`) — decompose multi-step work into goals; each completes only with **evidence**, and the final goal is a **verification story** that refuses "done" without a verify command + its result. The `Stop` hook blocks stopping while goals stay open. See [`completion-gate.md`](completion-gate.md).
 

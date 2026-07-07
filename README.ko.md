@@ -76,7 +76,7 @@ Antigravity는 `.agents/rules/`에 두거나, 전역 규칙은 `~/.gemini/GEMINI
 
 조언은 건너뛰기 쉽습니다. 플러그인으로 설치하면 `fable-workflow`는 훅(`hooks/`)으로 방법을 **강제**합니다:
 
-- **`UserPromptSubmit` → 주입** — 비-사소한 작업에서 방법을 컨텍스트에 자동 주입합니다(모델의 자동 발동에 기대지 않는 결정적 활성화).
+- **`UserPromptSubmit` → 주입** — 비-사소한 작업에서 **작업에 맞는 한 줄**(가장 잘 맞는 규율 하나: investigate · 완료 게이트 · verify · unknown 드러내기)만 주입합니다 — 고정 블록이 아니라 약 25토큰, 결정적 활성화.
 - **`Stop` → 검증 게이트** — 세션에서 코드를 고쳤는데 한 번도 실행하지 않았다면 Verify 단계를 건너뛴 것입니다. **기본은 권고(advisory)**, `FABLE_STRICT=1`로 두면 검증 전까지 종료를 **차단**합니다.
 - **완료 게이트** (`scripts/goals.py`) — 다단계 작업을 여러 goal로 분해하고, 각 goal은 **증거(evidence)** 가 있어야만 완료되며, 마지막 goal은 검증 명령과 그 결과 없이는 "완료"를 거부하는 **검증 스토리**입니다. goal이 열려 있는 동안 `Stop` 훅이 종료를 막습니다. [`completion-gate.md`](completion-gate.md) 참고.
 

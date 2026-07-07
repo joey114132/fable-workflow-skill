@@ -31,11 +31,16 @@ def check(cond, label):
     print(("PASS " if cond else "FAIL ") + label)
     fails += 0 if cond else 1
 
-# --- inject_method ---
+# --- inject_method (task-matched, token-lean) ---
 rc, out, _ = run("inject_method.py", {"prompt": "implement a rate limiter for our API"})
-check(rc == 0 and "fable-workflow" in out, "inject fires on a non-trivial task")
+check(rc == 0 and out.startswith("[fable-workflow]") and out.count("\n") <= 1,
+      "inject fires as a single tagged line on a non-trivial task")
 rc, out, _ = run("inject_method.py", {"prompt": "what is a rate limiter?"})
 check(rc == 0 and out.strip() == "", "inject stays silent on a plain question")
+rc, out, _ = run("inject_method.py", {"prompt": "debug why the auth flow is broken and fix it"})
+check("investigate" in out, "inject task-matches debugging → investigate")
+rc, out, _ = run("inject_method.py", {"prompt": "build the endpoint, then add tests, then deploy"})
+check("goals.py" in out or "multi-step" in out, "inject task-matches multi-step → completion gate")
 
 # --- verify_gate ---
 t = transcript([("Write", {"file_path": "/x/foo.py"})])
