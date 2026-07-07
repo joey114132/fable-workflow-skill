@@ -1,0 +1,18 @@
+{
+  "name": "fable-workflow",
+  "owner": {
+    "name": "Jeongwoo (Joey Lee)"
+  },
+  "description": "The fable-workflow agent skill — a Fable-style working method for any model.",
+  "plugins": [
+    {
+      "name": "fable-workflow",
+      "source": "./",
+      "description": "Fable-style agentic working method for any model — surface the unknowns before building on vague specs or unfamiliar code.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Jeongwoo (Joey Lee)"
+      }
+    }
+  ]
+}

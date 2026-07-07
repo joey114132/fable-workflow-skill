@@ -42,23 +42,18 @@
 
 ## 설치
 
-### Claude Code
-프로젝트의 `.claude/skills/` 안에 스킬을 복사(또는 심볼릭 링크)합니다:
+### Claude Code — 플러그인 (권장)
+```shell
+/plugin marketplace add joey114132/fable-workflow-skill
+/plugin install fable-workflow
+```
 
+### Claude Code — 수동 복사
 ```bash
 git clone https://github.com/joey114132/fable-workflow-skill.git
 ./fable-workflow-skill/install.sh ~/your-project/.claude/skills
 ```
-
-수동으로 하려면:
-
-```bash
-mkdir -p ~/your-project/.claude/skills/fable-workflow
-cp fable-workflow-skill/SKILL.md fable-workflow-skill/prompts.md \
-   ~/your-project/.claude/skills/fable-workflow/
-```
-
-Claude Code는 `SKILL.md`를 자동으로 찾아, YAML `description`을 보고 알아서 이 스킬을 발동합니다.
+또는 `SKILL.md` + `prompts.md`를 `~/your-project/.claude/skills/fable-workflow/`에 복사하세요. Claude Code는 `SKILL.md`를 자동으로 찾아 `description`을 보고 발동합니다.
 
 ### Cursor
 ```bash
@@ -85,16 +80,16 @@ Antigravity는 `.agents/rules/`에 두거나, 전역 규칙은 `~/.gemini/GEMINI
 
 | 모델 | 종류 | 스킬 없음 | 스킬 있음 | Δ |
 |---|---|:---:|:---:|:---:|
-| llama3:8b | local | 10 | 60 | **+50** |
-| gemma3:4b | local | 40 | 70 | +30 |
-| **Haiku 4.5** | cloud | 40 | 80 | +40 |
-| qwen2.5:7b | local | 50 | 70 | +20 |
-| qwen3.6 | local | 90 | 100 | +10 |
+| llama3:8b | local | 20 | 50 | **+30** |
+| gemma3:4b | local | 40 | 50 | +10 |
+| **Haiku 4.5** | cloud | 50 | 80 | **+30** |
+| qwen2.5:7b | local | 60 | 60 | 0 |
 | **Sonnet 5** | cloud | 90 | 100 | +10 |
 | **Opus 4.8** | cloud | 90 | 100 | +10 |
+| qwen3.6 | local | 90 | 100 | +10 |
 | **Fable 5** | cloud | 100 | 100 | 0 |
 
-점수는 100점 만점입니다(채점 기준은 [RESULTS.md](benchmark/RESULTS.md) 참고). **향상 폭은 기반 모델이 약할수록 큽니다** — 도움 없이 약한 모델일수록 효과가 큽니다(llama3:8b +50 → 프런티어 +10 → Fable +0). 클라우드·로컬 모두에서 같은 경향이며, Fable 5는 이미 기본으로 이 방식을 수행합니다.
+**답변·사고 품질**을 100점 만점으로 채점했습니다(채점 기준은 [RESULTS.md](benchmark/RESULTS.md) 참고). 이 스킬은 **추론 증폭기**입니다 — *사고(thinking)* 품질은 전반적으로 끌어올리지만, *답변* 품질은 모델이 그 계획을 실제로 구현할 수 있을 때만 오릅니다. 그래서 향상은 "능력은 있으나 덜 추론하던" 모델(llama3:8b, Haiku 4.5 — 둘 다 +30)에서 가장 큽니다. 이미 뛰어난 모델은 오를 자리가 없고(Fable +0), 가장 약한 모델은 계획은 나아져도 여전히 깨진 코드를 냅니다(gemma3 +10, qwen2.5 +0). **unknown을 드러낸다고 코드가 좋아지는 건 아닙니다.**
 
 전체 방법론·채점 기준·모델별 근거·한계는 **[benchmark/RESULTS.md](benchmark/RESULTS.md)** 를 보세요.
 

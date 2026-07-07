@@ -42,23 +42,18 @@ See [`SKILL.md`](SKILL.md) for the full method and [`prompts.md`](prompts.md) fo
 
 ## Install
 
-### Claude Code
-Copy (or symlink) the skill into your project's `.claude/skills/`:
+### Claude Code — plugin (recommended)
+```shell
+/plugin marketplace add joey114132/fable-workflow-skill
+/plugin install fable-workflow
+```
 
+### Claude Code — manual copy
 ```bash
 git clone https://github.com/joey114132/fable-workflow-skill.git
 ./fable-workflow-skill/install.sh ~/your-project/.claude/skills
 ```
-
-Or manually:
-
-```bash
-mkdir -p ~/your-project/.claude/skills/fable-workflow
-cp fable-workflow-skill/SKILL.md fable-workflow-skill/prompts.md \
-   ~/your-project/.claude/skills/fable-workflow/
-```
-
-Claude Code auto-discovers `SKILL.md` and triggers it from the YAML `description`.
+Or copy `SKILL.md` + `prompts.md` into `~/your-project/.claude/skills/fable-workflow/`. Claude Code auto-discovers `SKILL.md` and triggers it from the YAML `description`.
 
 ### Cursor
 ```bash
@@ -85,16 +80,16 @@ Does the skill actually change model behavior? A small A/B on a deliberately und
 
 | Model | Type | No skill | With skill | Δ |
 |---|---|:---:|:---:|:---:|
-| llama3:8b | local | 10 | 60 | **+50** |
-| gemma3:4b | local | 40 | 70 | +30 |
-| **Haiku 4.5** | cloud | 40 | 80 | +40 |
-| qwen2.5:7b | local | 50 | 70 | +20 |
-| qwen3.6 | local | 90 | 100 | +10 |
+| llama3:8b | local | 20 | 50 | **+30** |
+| gemma3:4b | local | 40 | 50 | +10 |
+| **Haiku 4.5** | cloud | 50 | 80 | **+30** |
+| qwen2.5:7b | local | 60 | 60 | 0 |
 | **Sonnet 5** | cloud | 90 | 100 | +10 |
 | **Opus 4.8** | cloud | 90 | 100 | +10 |
+| qwen3.6 | local | 90 | 100 | +10 |
 | **Fable 5** | cloud | 100 | 100 | 0 |
 
-Scores are out of 100 (rubric in [RESULTS.md](benchmark/RESULTS.md)). **The lift tracks base weakness** — the weaker a model is unaided, the more the skill helps (llama3:8b +50 → frontier +10 → Fable +0), across both cloud and local models. Fable 5 already does this natively; the skill ports that behavior onto everything else.
+Scored on **answer + thinking quality** out of 100 (rubric in [RESULTS.md](benchmark/RESULTS.md)). The skill is a **reasoning amplifier**: it lifts *thinking* across the board, but *answer* quality only rises when the model can also execute the plan. Biggest gains go to capable-but-under-reasoning models (llama3:8b, Haiku 4.5 — both +30); the already-excellent have no room (Fable +0) and the weakest still ship broken code (gemma3 +10, qwen2.5 net 0). **Surfacing unknowns ≠ better code.**
 
 Full methodology, rubric, per-model evidence, and limitations: **[benchmark/RESULTS.md](benchmark/RESULTS.md)**.
 
