@@ -1,7 +1,7 @@
 # fable-workflow-skill
 
-A single portable agent skill (`SKILL.md`) that ports Anthropic's "Field Guide to Fable"
-working method onto any model. This repo is docs + one skill — there is no build step.
+A single portable agent skill (`SKILL.md`) that ports a Fable-style working method onto any
+model. This repo is docs + one skill — there is no build step.
 
 ## Layout
 - `SKILL.md` — the skill itself (the only file agents load). Keep it under ~120 lines.

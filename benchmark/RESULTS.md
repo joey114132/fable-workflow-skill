@@ -10,6 +10,8 @@
 
 ## TL;DR
 
+![benchmark chart](bench.png)
+
 | Model | No skill | With skill | Δ |
 |---|:---:|:---:|:---:|
 | **Fable 5** | 10 | 10 | 0 |

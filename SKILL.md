@@ -2,7 +2,7 @@
 name: fable-workflow
 description: >
   Fable-style agentic working method, usable by ANY model (Opus, Sonnet, Haiku, Fable).
-  Distills Anthropic's "Field Guide to Fable" into a repeatable loop: unhobble the model
+  Distills a Fable-style agentic working method into a repeatable loop: unhobble the model
   with tools, find the unknowns BEFORE building, generate variants for taste calls, log
   every deviation, and keep the human in the loop. Use when starting a non-trivial coding,
   design, or research task — especially when the spec is vague, the codebase or domain is

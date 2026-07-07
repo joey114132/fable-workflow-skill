@@ -23,7 +23,7 @@
 
 ## What this is
 
-`fable-workflow` distills Anthropic's talk **["Field Guide to Fable" (Thariq Shihipar)](https://www.youtube.com/watch?v=9fubhllmsBU)** into a reusable [`SKILL.md`](SKILL.md) you can drop into Claude Code, Cursor, or any agent framework.
+`fable-workflow` packages a working method for Anthropic's Fable-class models into a reusable [`SKILL.md`](SKILL.md) you can drop into Claude Code, Cursor, or any agent framework.
 
 Capable models are powerful enough to explore a huge solution space on their own. So the bottleneck is no longer the *model's* ability — it's whether **your mental map matches the territory** before the model starts moving. Every place your spec is silent is an **unknown**: an unspecified decision the model will otherwise guess at silently. This skill makes the model **surface those unknowns first**, then build.
 
@@ -67,6 +67,8 @@ Load [`SKILL.md`](SKILL.md) as system-prompt context when a task matches the tri
 
 Does the skill actually change model behavior? A small A/B on a deliberately under-specified spec (*"Limit our API to 100 requests per minute"* — which hides ~8 architecture-changing unknowns), run across four models with and without the skill:
 
+![benchmark](benchmark/bench.png)
+
 | Model | No skill | With skill | Δ |
 |---|:---:|:---:|:---:|
 | **Fable 5** | 10 | 10 | 0 |
@@ -93,9 +95,9 @@ fable-workflow-skill/
 └── README.ko.md        # 한국어
 ```
 
-## Credit
+## Notes
 
-Method by **Thariq Shihipar (Anthropic)** — ["Field Guide to Fable"](https://www.youtube.com/watch?v=9fubhllmsBU), AI Engineer. This repo packages that method as a skill; it is not an official Anthropic release.
+This repo packages a working method as a skill. It is not an official Anthropic release.
 
 ## License
 
