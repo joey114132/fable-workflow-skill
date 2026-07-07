@@ -4,7 +4,7 @@
 
 **Question it answers:** when a model is given an under-specified task, does injecting the `fable-workflow` skill improve the **quality of its answer and its thinking** — and does that help more on some models than others?
 
-> ⚠️ **Read the [Limitations](#limitations) section before quoting these numbers.** This is a small directional pilot (n=1 task, single trial, self-judged, coarse bands), not a statistically robust leaderboard.
+> ⚠️ **Read the [Limitations](#limitations) before quoting these numbers.** This is a directional pilot (n=1 task, **single trial**, self-judged). One cell even went *down* on this run (gemma3:4b) purely from run-to-run variance — see below.
 
 ---
 
@@ -12,20 +12,25 @@
 
 ![benchmark chart](bench.png)
 
-Scored on **answer + thinking quality**, out of **100**.
+Every run is scored on **answer + thinking quality out of 100**, split into two halves:
 
-| Model | Type | No skill | With skill | Δ |
-|---|---|:---:|:---:|:---:|
-| llama3:8b | local | 20 | 50 | **+30** |
-| gemma3:4b | local | 40 | 50 | +10 |
-| **Haiku 4.5** | cloud | 50 | 80 | **+30** |
-| qwen2.5:7b | local | 60 | 60 | 0 |
-| **Sonnet 5** | cloud | 90 | 100 | +10 |
-| **Opus 4.8** | cloud | 90 | 100 | +10 |
-| qwen3.6 | local | 90 | 100 | +10 |
-| **Fable 5** | cloud | 100 | 100 | 0 |
+| Model | Type | Think /50 (no→with) | Answer /50 (no→with) | **Total (no→with)** | Δ |
+|---|---|:---:|:---:|:---:|:---:|
+| llama3:8b | local | 3 → 19 | 5 → 8 | **8 → 27** | +19 |
+| qwen2.5:7b | local | 11 → 29 | 33 → 25 | **44 → 54** | +10 |
+| gemma3:4b | local | 13 → 30 | 37 → 8 | **50 → 38** | **−12** |
+| **Haiku 4.5** | cloud | 27 → 39 | 39 → 42 | **66 → 81** | +15 |
+| qwen3.6 | local | 34 → 38 | 48 → 49 | **82 → 87** | +5 |
+| **Sonnet 5** | cloud | 43 → 48 | 48 → 50 | **91 → 98** | +7 |
+| **Opus 4.8** | cloud | 46 → 48 | 49 → 50 | **95 → 98** | +3 |
+| **Fable 5** | cloud | 46 → 50 | 50 → 50 | **96 → 100** | +4 |
 
-Measuring **answer + thinking quality** (not merely "did it list the unknowns") tells a sharper, more honest story: the skill is a **reasoning amplifier, not a coding amplifier.** It reliably lifts *thinking* — the model reasons about the real decisions — but *answer* quality only rises when the model can also **execute** that plan. So the biggest total-quality gains land on **capable-but-under-reasoning** models (llama3:8b 20→50, Haiku 4.5 50→80, both +30). At the extremes the gain fades: the already-excellent have no room (Fable 100→100; frontier +10), and the weakest coders improve their *plan* but still ship broken code (gemma3 +10; qwen2.5:7b **net 0** — better reasoning, but it dropped an `import`). **Surfacing unknowns ≠ better code.**
+**The split is the finding.** The skill's effect is asymmetric:
+
+- **Thinking quality goes up for *every* model, no exceptions** (+2 to +18). The skill reliably makes a model reason about the real decisions.
+- **Answer quality only rises when the model can already code the plan.** For the frontier it climbs a little (already near-ceiling); for weak local models it's **flat or negative** — gemma3:4b's *answer* score fell 37→8 because, unaided, it happened to write a correct sliding-window limiter, while with the skill it reasoned more but shipped broken counting logic.
+
+So: **the skill is a reasoning amplifier, not a coding amplifier.** Biggest total gains land on capable-but-under-reasoning models (llama3:8b +19, Haiku 4.5 +15). Fable 5 earns **96 unaided** (not a free 100) and tops out at 100 with the skill.
 
 ---
 
@@ -33,69 +38,75 @@ Measuring **answer + thinking quality** (not merely "did it list the unknowns") 
 
 ### Task (identical for every run)
 
-A deliberately under-specified spec, framed as a one-shot autonomous job (the model **cannot** ask questions):
+A deliberately under-specified spec, one-shot autonomous (the model **cannot** ask questions):
 
 > **TASK:** Add rate limiting to our web API.
 > **SPEC (verbatim from the product owner):** *"Users shouldn't be able to spam our API. Limit it to 100 requests per minute."*
 > Deliver a Python rate-limiter implementation plus a short note.
 
-This spec hides at least ~8 **architecture- or behavior-changing unknowns**: scope (per-IP / per-user / per-key / global), window algorithm (fixed / sliding / token-bucket — fixed allows a 2× boundary burst), storage (in-memory / distributed), over-limit behavior (429 / queue / `Retry-After`), burst tolerance, concurrency (thread safety), clock source (wall vs monotonic), and memory growth (idle-key eviction).
+It hides ~8 architecture-/behavior-changing unknowns: scope (per-IP / per-user / per-key / global), window algorithm (fixed / sliding / token-bucket — fixed allows a 2× boundary burst), storage (in-memory / distributed), over-limit behavior (429 / `Retry-After`), burst tolerance, concurrency (thread safety), clock source (wall vs monotonic), memory growth (idle-key eviction).
 
 ### Conditions
 
 - **No skill:** the task prompt alone.
-- **With skill:** the same task + the skill's one-shot instruction (surface an UNKNOWNS list first, pick a default per item with a one-line reason, then implement).
+- **With skill:** the same task + the skill's one-shot instruction (surface an UNKNOWNS list with defaults + reasons, then implement).
 
-### Models
+### Models (8 × 2 = 16 runs)
 
 - **Cloud (Anthropic):** Fable 5, Opus 4.8, Sonnet 5, Haiku 4.5 — identical `general-purpose` subagents.
 - **Local (ollama, RTX 3080 Ti 16 GB):** qwen3.6, qwen2.5:7b, llama3:8b, gemma3:4b — via `ollama run` with the identical prompts.
 
-8 models × 2 conditions = **16 runs**. (GLM 5.2 was requested but **not run** — no API key was available.)
+### Detailed rubric (out of 100)
 
-### Rubric (out of 100) — answer + thinking quality
+Each output is scored against explicit, checkable criteria — not a coarse band.
 
-Each run is judged holistically on a 0–100 scale that blends two things:
+**Thinking / analysis — 50 pts**
+| Criterion | Pts |
+|---|:---:|
+| Unknowns coverage (4 pts each × 8 reference unknowns) | 0–32 |
+| Justification quality (defaults backed by sound tradeoff reasoning) | 0–10 |
+| Edge-case awareness (names the boundary-burst and/or multi-worker N×limit issue) | 0–8 |
 
-- **Thinking quality** — did it reason correctly about the *real* decisions and tradeoffs (scope, window algorithm, concurrency, storage, edge cases like the boundary burst and clock source)?
-- **Answer quality** — is the delivered code + note actually correct and usable (enforces 100/min, thread-safe, right window semantics, no crashes / missing imports)?
-
-Scored in coarse 10-point bands. Treat ±10 as noise (see [Limitations](#limitations)).
+**Answer / implementation — 50 pts**
+| Criterion | Pts |
+|---|:---:|
+| Enforces the limit correctly (100 / window) | 0–12 |
+| Correct window semantics (no silent boundary-burst bug) | 0–8 |
+| Thread-safe (lock / atomic) | 0–8 |
+| Per-key / scope implemented (not just one global bucket) | 0–8 |
+| Over-limit response (429 + `Retry-After`) | 0–6 |
+| Runs without fatal bugs (imports present, no crash, not a non-functional stub) | 0–8 |
 
 ---
 
 ## Per-model evidence
 
 ### Cloud
-- **Fable 5 (100 → 100).** Excellent reasoning *and* correct, self-verified code in both conditions — a genuine ceiling. The skill has nothing to add.
-- **Sonnet 5 / Opus 4.8 (90 → 100, +10).** Strong reasoning + correct implementations (`Retry-After`, self-checks) even unaided; the skill mostly reshaped the reasoning into an explicit prioritized form and tightened the output.
-- **Haiku 4.5 (50 → 80, +30) — the clearest cloud win.** Unaided it *mis-reasoned* — it called a fixed-window counter a "token bucket," carrying the 200-request boundary-burst bug. The skill fixed both the reasoning (correct sliding window) and the answer.
+- **Fable 5 (96 → 100).** Unaided: correct sliding-window, thread-safe, monotonic clock, `Retry-After` fully wired, self-verified — but didn't *explicitly* name clock-source as a decision and skipped burst, so **96, not 100**. With the skill: 9 unknowns incl. the subtle *"do rejected requests consume budget?"*, plus a rigorous injected-clock self-check → 100.
+- **Sonnet 5 (91 → 98) / Opus 4.8 (95 → 98).** Strong reasoning + correct token-bucket/sliding implementations even unaided; the skill mostly reshaped the reasoning into an explicit prioritized list (+7 / +3).
+- **Haiku 4.5 (66 → 81) — clearest cloud win.** Unaided it *mis-reasoned*: called a fixed-window counter a "token bucket," carrying the boundary-burst bug. The skill fixed both the reasoning (correct sliding window) and the answer (+15).
 
 ### Local (ollama)
-- **qwen3.6 (90 → 100, +10).** A local reasoning model whose visible "thinking" already reasons through the decisions (scope, sliding-vs-fixed, clock source) and writes correct thread-safe code — it behaves like the frontier.
-- **llama3:8b (20 → 50, +30) — the biggest single jump.** Unaided it produced no real reasoning and broken code (`dict.keys()[0]` crashes, incoherent threading). The skill gave it a coherent plan and workable-ish code.
-- **gemma3:4b (40 → 50, +10) & qwen2.5:7b (60 → 60, 0).** The skill improved their *reasoning* (real unknowns, sensible defaults) but their *code stayed broken* — gemma3 shipped no time window at all; qwen2.5 dropped `import time` and stubbed its state. So total quality barely moved. This is the clearest evidence that **on weak models the skill lifts thinking, not implementation.**
+- **qwen3.6 (82 → 87).** A local reasoning model — its thinking trace already reasons through the decisions and it writes correct thread-safe code. Behaves like the frontier; small lift (+5).
+- **llama3:8b (8 → 27) — biggest jump.** Unaided: no real reasoning and broken code (a counter that never actually limits). With the skill: a coherent UNKNOWNS list and structured code — though the implementation is still shaky (+19, almost all of it in *Thinking*).
+- **qwen2.5:7b (44 → 54) & gemma3:4b (50 → 38).** Both show the asymmetry starkly. Their **Thinking** jumped (+18, +17). Their **Answer** *fell* (−8, −29): unaided, each happened to emit a clean sliding-window counter; with the skill they spent effort on unknowns and shipped worse code (qwen2.5 dropped a clean design; gemma3 wrote non-functional counting logic). gemma3's total therefore went **negative** — a vivid n=1 variance artifact.
 
 ## Interpretation
 
-On answer + thinking quality, the skill is a **reasoning amplifier, not a coding amplifier.** It reliably makes a model reason about the right decisions; whether that becomes a better *answer* depends on whether the model can already code the plan. Net effect: the biggest quality gains go to **capable-but-under-reasoning** models (llama3:8b, Haiku 4.5); little to the already-excellent (no room) or the weakest coders (better plan, still-broken code). **Capability, not vendor, sets the ceiling** — a strong local model (qwen3.6) sits with the frontier.
+On answer + thinking quality, the skill is a **reasoning amplifier, not a coding amplifier.** It reliably makes a model reason about the right decisions (Thinking up for all 8 models); whether that becomes a better *answer* depends on whether the model can already code the plan. Net: biggest total gains for **capable-but-under-reasoning** models (llama3, Haiku); small for the already-excellent (no room); noisy or negative for weak local coders (better plan, worse or unchanged code). **Capability, not vendor, sets the ceiling** — a strong local model (qwen3.6) sits with the frontier.
 
 ---
 
 ## Limitations
 
-Do not over-read these numbers.
-
-- **n = 1 task, single trial, no repeats.** No error bars.
-- **Coarse 10-point bands, single sample → treat ±10 as noise.** The qwen2.5:7b "0" and the exact frontier "+10"s are within noise; the *pattern* (thinking up, answer only when the model can code) is the takeaway, not any individual cell.
-- **Self-judged.** Scoring was done by one of the contestant models (Opus 4.8), a bias risk — especially for the Opus row.
-- **One-shot autonomous only tests one slice of the skill.** The interactive moves — *interview me*, *blind-spot pass over a real codebase*, *N variants*, *quiz-back before merge* — do not fire in a single autonomous shot.
-- **GLM 5.2 was not run** — no API key available. Provide a Zhipu / OpenRouter key to add it.
-- **Single task domain** (rate limiting). Results may not transfer to other kinds of ambiguity.
+- **n = 1 task, single trial.** No repeats, no error bars. **gemma3:4b's −12 is the proof**: it comes from its unaided run happening to produce correct code this time, not from the skill "hurting." Treat any single Δ under ~10 as noise.
+- **Self-judged.** Scoring was done by one of the contestant models (Opus 4.8), a bias risk — especially the Opus row.
+- **One-shot autonomous tests only one slice of the skill.** The interactive moves — *interview me*, *blind-spot pass over a real codebase*, *N variants*, *quiz-back before merge* — do not fire in a single autonomous shot.
+- **Single task domain** (rate limiting). Results may not transfer.
 
 ### To make it robust
-- Use a **neutral judge** model (not a contestant) — ideally an ensemble — to score answer + thinking quality.
-- Run **3–5 trials per cell** for variance.
+- Use a **neutral judge** (not a contestant), ideally an ensemble.
+- Run **3–5 trials per cell** and report mean ± spread — this alone would erase the gemma3 artifact.
 - Broaden to **several task domains**.
 
 ---
@@ -122,4 +133,4 @@ there is an UNKNOWN — a decision it didn't make. Since you can't ask me:
 3) THEN implement, matching your defaults.
 ```
 
-Judge each output on **answer + thinking quality** (out of 100) using the rubric above. Prefer a judge that is *not* one of the models under test.
+Score each output against the detailed rubric above (Thinking /50 + Answer /50). Prefer a judge that is *not* one of the models under test.

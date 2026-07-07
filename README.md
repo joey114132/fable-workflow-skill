@@ -80,16 +80,16 @@ Does the skill actually change model behavior? A small A/B on a deliberately und
 
 | Model | Type | No skill | With skill | Δ |
 |---|---|:---:|:---:|:---:|
-| llama3:8b | local | 20 | 50 | **+30** |
-| gemma3:4b | local | 40 | 50 | +10 |
-| **Haiku 4.5** | cloud | 50 | 80 | **+30** |
-| qwen2.5:7b | local | 60 | 60 | 0 |
-| **Sonnet 5** | cloud | 90 | 100 | +10 |
-| **Opus 4.8** | cloud | 90 | 100 | +10 |
-| qwen3.6 | local | 90 | 100 | +10 |
-| **Fable 5** | cloud | 100 | 100 | 0 |
+| llama3:8b | local | 8 | 27 | **+19** |
+| qwen2.5:7b | local | 44 | 54 | +10 |
+| gemma3:4b | local | 50 | 38 | **−12** |
+| **Haiku 4.5** | cloud | 66 | 81 | **+15** |
+| qwen3.6 | local | 82 | 87 | +5 |
+| **Sonnet 5** | cloud | 91 | 98 | +7 |
+| **Opus 4.8** | cloud | 95 | 98 | +3 |
+| **Fable 5** | cloud | 96 | 100 | +4 |
 
-Scored on **answer + thinking quality** out of 100 (rubric in [RESULTS.md](benchmark/RESULTS.md)). The skill is a **reasoning amplifier**: it lifts *thinking* across the board, but *answer* quality only rises when the model can also execute the plan. Biggest gains go to capable-but-under-reasoning models (llama3:8b, Haiku 4.5 — both +30); the already-excellent have no room (Fable +0) and the weakest still ship broken code (gemma3 +10, qwen2.5 net 0). **Surfacing unknowns ≠ better code.**
+Scored on **answer + thinking quality** out of 100, split Thinking /50 + Answer /50 ([detailed rubric + sub-scores](benchmark/RESULTS.md)). The skill is a **reasoning amplifier, not a coding amplifier**: *thinking* quality rises for **every** model (+2 to +18), but *answer* quality only improves when the model can already code the plan — flat or negative for weak locals (gemma3's **−12** is an n=1 variance artifact; see RESULTS). Biggest total gains: capable-but-under-reasoning models (llama3:8b +19, Haiku 4.5 +15). Fable 5 scores **96 unaided** — not a free 100.
 
 Full methodology, rubric, per-model evidence, and limitations: **[benchmark/RESULTS.md](benchmark/RESULTS.md)**.
 
