@@ -41,3 +41,25 @@ New-domain variant:
 > You can't ask me questions on this run. So first write an **UNKNOWNS** list (the decision
 > points my spec left open), pick a sensible default for each **and say why**, THEN implement.
 > Surface the unknowns even though you're proceeding without me.
+
+## Small / local models (≤ ~8B)
+
+A weak model spends its limited capacity on the process and then botches the code — asking a
+4B model to *derive* an implementation while also producing a full unknowns list makes the code
+**worse**, not better (verified: gemma3:4b inverts the logic). Fix: cap the analysis and use the
+**references-as-maps** move — have it *adapt a known-good reference* instead of deriving.
+
+> You're building a small feature and CANNOT ask questions. Keep it short.
+> STEP 1 — list only the **2–3 most important** open decisions, each with a one-line default.
+> STEP 2 — implement by **ADAPTING the reference below** to those defaults. Keep its structure
+> and algorithm; do NOT invent a new approach.
+>
+> REFERENCE (a known-good implementation of the pattern you want — adapt, don't rewrite):
+> ```
+> {paste a correct example/skeleton of the target pattern}
+> ```
+>
+> TASK: {your task + spec}
+
+No reference handy? Prefer a stronger local model — per the benchmark, a reasoning model
+(qwen3.6) handled the full method fine (82→87), while gemma3:4b needed this variant.

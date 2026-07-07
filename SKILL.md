@@ -97,3 +97,8 @@ loop is how you keep steering toward value instead of just shipping motion.
   near-identical options give the human nothing to react to.
 - **Logging assumptions is not optional cover.** It's the artifact that lets the human catch
   a wrong guess *before* it ships. An unlogged assumption is a silent bet.
+- **Weak/small models (≤ ~8B) need the lite variant.** The full "surface all unknowns, then
+  derive the code" prompt crowds a small model's capacity and *degrades* its implementation —
+  it reasons more but codes worse. For those, cap unknowns at 2–3 and anchor with a **reference
+  to adapt** rather than derive (see `prompts.md` → Small / local models). Capable/reasoning
+  models don't need this.
