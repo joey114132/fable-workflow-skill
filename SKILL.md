@@ -75,6 +75,8 @@ Before calling it done, **exercise the result** — good reasoning does not guar
 answer. Code: run it, or write the smallest check that fails if the logic breaks, and look at
 the output. Research/analysis: test the key claim against a source. Design/writing: put it in
 front of the real context. This is the step that turns a sound *plan* into a correct *result*.
+When verify **fails**, don't one-shot again — enter a bounded **correction loop** (attempt →
+verify → diagnose → repeat) with explicit stop conditions. See `loop-engineering.md`.
 
 ### 5. Stay in the loop — keep owning it
 Before merging/PR, have the model **quiz you** on what changed, so you can actually represent
@@ -109,6 +111,9 @@ loop is how you keep steering toward value instead of just shipping motion.
 - **A surfaced plan is not a verified answer.** The method's real limit: it reliably improves
   *reasoning*, but reasoning ≠ a correct result — especially for code. Don't stop at a great
   UNKNOWNS list and confident prose; **step 4 (verify) is mandatory** — exercise the output.
+- **A correction loop needs exits.** Retrying a failing step with no new hypothesis, or looping
+  past a discovered unknown, is a hang — not progress. Cap iterations, require a moving signal
+  each turn, and break to the human when stuck (`loop-engineering.md`).
 - **Weak/small models (≤ ~8B) need the lite variant.** The full "surface all unknowns, then
   derive the code" prompt crowds a small model's capacity and *degrades* its implementation —
   it reasons more but codes worse. For those, cap unknowns at 2–3 and anchor with a **reference

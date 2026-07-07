@@ -23,7 +23,7 @@ it silently. Surface it first, then build.
    - **Variants** — for taste calls (design, output format, API shape), offer **N genuinely different** options to react to, not one.
    - **References as maps** — prefer an example/mockup over a written spec ("build in the spirit of this").
 3. **Build, logging deviations** — keep a running **ASSUMPTIONS / NOTES** list of every unknown hit and the choice made.
-4. **Verify — make it real** — exercise the result before calling it done (code: run it / smallest check; research: verify the claim against a source). A good plan is not a correct answer.
+4. **Verify — make it real** — exercise the result before calling it done (code: run it / smallest check; research: verify the claim against a source). A good plan is not a correct answer. If it fails, enter a bounded correction loop (attempt → verify → diagnose → repeat) with a max-iterations cap; stop and surface the blocker if the signal stalls.
 5. **Stay in the loop** — **quiz the human** before merge so they still own the work.
 
 ## Rules

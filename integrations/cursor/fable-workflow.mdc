@@ -18,7 +18,7 @@ it silently. Surface it first, then build. (Skip this for trivial one-line chang
    - **Variants** — for taste calls (design/format/API), offer N genuinely different options.
    - **References as maps** — prefer an example/mockup over a written spec.
 3. **Build, logging deviations** — keep a running ASSUMPTIONS / NOTES list of every unknown hit.
-4. **Verify — make it real** — exercise the result (run it / smallest check); a good plan isn't a correct answer.
+4. **Verify — make it real** — exercise the result (run it / smallest check); a good plan isn't a correct answer. On failure, loop attempt→verify→diagnose with a max-tries cap; stop/surface if the signal stalls.
 5. **Stay in the loop** — quiz the human before merge.
 
 ## Rules

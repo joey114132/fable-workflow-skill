@@ -38,6 +38,11 @@ New-domain variant:
 > if the logic breaks, and show the output. Research/analysis: verify the key claim against a
 > source. Design/doc: put it in the real context and show how it holds up.
 
+## Correction loop (when verify fails)
+> Don't retry blindly. Each attempt: state ONE hypothesis for *why* it failed, change only that,
+> re-verify, and log hypothesis → change → result. Cap it at N tries. If the signal doesn't change
+> across 2 iterations, stop and re-isolate — or tell me the unknown you hit. Don't loop forever.
+
 ## Quiz me (stay in the loop before merge)
 > Before I open the PR, **quiz me** on what changed and why — the decisions I'd need to
 > defend in review. Flag anything I get wrong or can't explain.
