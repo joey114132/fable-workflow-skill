@@ -1,0 +1,27 @@
+---
+description: Fable Workflow — on vague/ambiguous specs or unfamiliar code, surface the unknowns BEFORE building (blind-spot pass, interview, variants, log assumptions) instead of guessing silently. Apply to non-trivial coding/design/research tasks.
+globs: []
+alwaysApply: false
+---
+
+# Fable Workflow
+
+**The map is not the territory.** The spec/prompt is the *map*; the real codebase and constraints
+are the *territory*. Wherever they diverge is an **unknown** — an unspecified decision. Don't guess
+it silently. Surface it first, then build. (Skip this for trivial one-line changes.)
+
+## The loop
+1. **Unhobble** — use tools, not memory. Counting / enumeration / precise lookup → *write a script*.
+2. **Find the unknowns before building:**
+   - **Blind-spot pass** — "list my unknown-unknowns and the gotchas in this module/domain."
+   - **Interview me** — ask questions, prioritising ones that would change the architecture.
+   - **Variants** — for taste calls (design/format/API), offer N genuinely different options.
+   - **References as maps** — prefer an example/mockup over a written spec.
+3. **Build, logging deviations** — keep a running ASSUMPTIONS / NOTES list of every unknown hit.
+4. **Stay in the loop** — quiz the human before merge.
+
+## Rules
+- Vague spec / unfamiliar territory → find unknowns before implementing; don't build one interpretation silently.
+- Enumeration / counting / precise lookup → script it, don't recall.
+- Taste / subjective call → offer variants.
+- Can't ask (autonomous)? Write an UNKNOWNS list, pick a default per item with a one-line reason, log them, then proceed.

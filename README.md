@@ -60,8 +60,22 @@ cp fable-workflow-skill/SKILL.md fable-workflow-skill/prompts.md \
 
 Claude Code auto-discovers `SKILL.md` and triggers it from the YAML `description`.
 
-### Cursor / custom agent frameworks
-Load [`SKILL.md`](SKILL.md) as system-prompt context when a task matches the triggers (vague spec, unfamiliar codebase/domain, "find my unknowns", "blind spot pass", "give me N variants").
+### Cursor
+```bash
+git clone https://github.com/joey114132/fable-workflow-skill.git
+mkdir -p .cursor/rules
+cp fable-workflow-skill/integrations/cursor/fable-workflow.mdc .cursor/rules/
+```
+Cursor loads it in agent-requested mode via the rule's `description`.
+
+### Antigravity · Codex · Aider · Zed & other AGENTS.md agents
+Copy the portable rule to your project root:
+```bash
+cp fable-workflow-skill/integrations/AGENTS.md ./AGENTS.md
+```
+Antigravity also accepts it in `.agents/rules/`, or `~/.gemini/GEMINI.md` for global rules.
+
+All adapters and per-tool details: [`integrations/`](integrations/).
 
 ## Benchmark
 
@@ -84,13 +98,16 @@ Full methodology, rubric, per-model evidence, and limitations: **[benchmark/RESU
 
 ```
 fable-workflow-skill/
-├── SKILL.md            # the skill (drop-in)
+├── SKILL.md            # the skill (drop-in, canonical method)
 ├── prompts.md          # copy-paste prompt templates
+├── integrations/       # adapters for other tools
+│   ├── AGENTS.md       # Antigravity · Codex · Aider · Zed · Jules …
+│   └── cursor/fable-workflow.mdc
 ├── install.sh          # copy the skill into a .claude/skills dir
 ├── benchmark/
-│   └── RESULTS.md      # cross-model A/B evaluation
-├── assets/
-│   └── banner.png      # (add your generated banner here)
+│   ├── RESULTS.md      # cross-model A/B evaluation
+│   └── bench.png       # results chart
+├── assets/banner.png
 ├── README.md           # English
 └── README.ko.md        # 한국어
 ```
