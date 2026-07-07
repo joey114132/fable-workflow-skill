@@ -1,0 +1,102 @@
+<p align="center">
+  <img src="assets/banner.png" alt="Fable Workflow" width="100%">
+</p>
+
+<h1 align="center">Fable Workflow</h1>
+
+<p align="center">
+  어떤 모델(Opus·Sonnet·Haiku·Fable)에게도 Anthropic의 Fable처럼 일하게 만드는
+  이식 가능한 에이전트 스킬입니다. 핵심은 <b>"만들기 전에 모르는 것(unknown)을 먼저 드러낸다"</b>입니다.
+</p>
+
+<p align="center">
+  <a href="README.md">English</a> · <b>한국어</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT">
+  <img src="https://img.shields.io/badge/format-SKILL.md-purple" alt="SKILL.md">
+  <img src="https://img.shields.io/badge/models-Opus%20%C2%B7%20Sonnet%20%C2%B7%20Haiku%20%C2%B7%20Fable-orange" alt="models">
+</p>
+
+---
+
+## 이게 뭔가요
+
+`fable-workflow`는 Anthropic의 발표 **["Field Guide to Fable" (Thariq Shihipar)](https://www.youtube.com/watch?v=9fubhllmsBU)** 를 재사용 가능한 [`SKILL.md`](SKILL.md) 하나로 정리한 것입니다. Claude Code, Cursor, 또는 어떤 에이전트 프레임워크에도 그대로 넣을 수 있습니다.
+
+요즘 모델은 스스로 방대한 해답 공간을 탐색할 만큼 강력합니다. 그래서 병목은 더 이상 *모델의 능력*이 아니라, **모델이 움직이기 전에 내 머릿속 지도가 실제 현실과 얼마나 맞는가**입니다. 스펙이 말하지 않은 지점 하나하나가 **unknown**(모델이 정하지 않은 결정 지점)이고, 그냥 두면 모델은 이를 **말없이 임의로 결정**해 버립니다. 이 스킬은 모델이 그 unknown들을 **먼저 드러내게** 한 뒤에 만들게 합니다.
+
+## 핵심 한 가지
+
+> **지도는 영토가 아니다.** 내 계획·스펙·프롬프트는 *지도*이고, 실제 코드베이스와 제약은 *영토*입니다. 둘이 어긋나는 지점이 바로 **unknown**입니다. 모델이 추측하게 두지 말고, 그 결정을 명시적으로 내리세요.
+
+## 작업 루프
+
+1. **족쇄 풀기(Unhobble)** — 기억이 아니라 도구를 쓰게 합니다. 세기·열거·조회는 *스크립트로* 풀게 하세요.
+2. **모르는 것 찾기** — 만들기 전에: 블라인드 스팟 패스, 나를 인터뷰시키기, 취향 결정은 여러 변형(N개) 제시, 스펙 대신 레퍼런스(다른 지도) 주기.
+3. **만들면서 이탈 기록** — 마주친 unknown과 그때의 선택을 ASSUMPTIONS / NOTES 목록으로 남깁니다.
+4. **루프 안에 남기** — 병합 전 모델이 나를 퀴즈로 확인하게 해서, 내가 작업을 계속 주도하도록 합니다.
+
+전체 방법은 [`SKILL.md`](SKILL.md), 복사해서 바로 쓰는 프롬프트는 [`prompts.md`](prompts.md)를 참고하세요.
+
+## 설치
+
+### Claude Code
+프로젝트의 `.claude/skills/` 안에 스킬을 복사(또는 심볼릭 링크)합니다:
+
+```bash
+git clone https://github.com/joey114132/fable-workflow-skill.git
+./fable-workflow-skill/install.sh ~/your-project/.claude/skills
+```
+
+수동으로 하려면:
+
+```bash
+mkdir -p ~/your-project/.claude/skills/fable-workflow
+cp fable-workflow-skill/SKILL.md fable-workflow-skill/prompts.md \
+   ~/your-project/.claude/skills/fable-workflow/
+```
+
+Claude Code는 `SKILL.md`를 자동으로 찾아, YAML `description`을 보고 알아서 이 스킬을 발동합니다.
+
+### Cursor / 커스텀 에이전트 프레임워크
+작업이 트리거(모호한 스펙, 낯선 코드베이스/분야, "내 unknown 찾아줘", "블라인드 스팟 패스", "변형 N개 줘")에 맞을 때 [`SKILL.md`](SKILL.md)를 시스템 프롬프트 컨텍스트로 로드하세요.
+
+## 벤치마크
+
+이 스킬이 실제로 모델의 행동을 바꿀까요? 일부러 모호하게 쓴 스펙(*"우리 API를 분당 100요청으로 제한해줘"* — 아키텍처를 바꿀 만한 unknown이 약 8개 숨어 있음)으로, 네 모델을 스킬 있음/없음으로 나눠 A/B 테스트했습니다:
+
+| 모델 | 스킬 없음 | 스킬 있음 | Δ |
+|---|:---:|:---:|:---:|
+| **Fable 5** | 10 | 10 | 0 |
+| **Opus 4.8** | 9 | 10 | +1 |
+| **Sonnet 5** | 9 | 10 | +1 |
+| **Haiku 4.5** | 4 | 8 | **+4** |
+
+**스킬은 모델이 약할수록 더 크게 돕습니다.** Fable 5는 이미 이 방식을 기본으로 수행하므로 더할 게 없고, 스킬은 그 행동을 더 저렴하거나 약한 모델에 이식합니다 — Haiku에서 +4의 향상.
+
+전체 방법론·채점 기준·모델별 근거·한계는 **[benchmark/RESULTS.md](benchmark/RESULTS.md)** 를 보세요.
+
+## 저장소 구조
+
+```
+fable-workflow-skill/
+├── SKILL.md            # 스킬 본체 (그대로 드롭인)
+├── prompts.md          # 복사해서 쓰는 프롬프트 템플릿
+├── install.sh          # .claude/skills 디렉터리로 스킬 복사
+├── benchmark/
+│   └── RESULTS.md      # 모델 간 A/B 평가
+├── assets/
+│   └── banner.png      # (직접 생성한 배너를 여기에 넣으세요)
+├── README.md           # English
+└── README.ko.md        # 한국어
+```
+
+## 출처
+
+방법론 원저: **Thariq Shihipar (Anthropic)** — ["Field Guide to Fable"](https://www.youtube.com/watch?v=9fubhllmsBU), AI Engineer. 이 저장소는 그 방법을 스킬로 포장한 것이며, Anthropic의 공식 배포물이 아닙니다.
+
+## 라이선스
+
+[MIT](LICENSE)
