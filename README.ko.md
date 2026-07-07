@@ -72,6 +72,15 @@ Antigravity는 `.agents/rules/`에 두거나, 전역 규칙은 `~/.gemini/GEMINI
 
 모든 어댑터와 툴별 상세는 [`integrations/`](integrations/)를 보세요.
 
+## 강제 적용 (Claude Code 플러그인)
+
+조언은 건너뛰기 쉽습니다. 플러그인으로 설치하면 `fable-workflow`는 훅(`hooks/`)으로 방법을 **강제**합니다:
+
+- **`UserPromptSubmit` → 주입** — 비-사소한 작업에서 방법을 컨텍스트에 자동 주입합니다(모델의 자동 발동에 기대지 않는 결정적 활성화).
+- **`Stop` → 검증 게이트** — 세션에서 코드를 고쳤는데 한 번도 실행하지 않았다면 Verify 단계를 건너뛴 것입니다. **기본은 권고(advisory)**, `FABLE_STRICT=1`로 두면 검증 전까지 종료를 **차단**합니다.
+
+이 게이트는 보수적 휴리스틱이라 오작동할 수 있어(예: "원하시면 X 하겠습니다" 같은 선언형) 기본은 권고, 차단은 옵트인입니다. 로직은 `hooks/test_hooks.py`로 검증합니다.
+
 ## 벤치마크
 
 이 스킬이 실제로 모델의 행동을 바꿀까요? 일부러 모호하게 쓴 스펙(*"우리 API를 분당 100요청으로 제한해줘"* — 아키텍처를 바꿀 만한 unknown이 약 8개 숨어 있음)으로, 클라우드와 로컬을 합쳐 여덟 모델을 스킬 있음/없음으로 나눠 A/B 테스트했습니다:
@@ -99,6 +108,8 @@ Antigravity는 `.agents/rules/`에 두거나, 전역 규칙은 `~/.gemini/GEMINI
 fable-workflow-skill/
 ├── SKILL.md            # 스킬 본체 (그대로 드롭인, 방법론 원본)
 ├── prompts.md          # 복사해서 쓰는 프롬프트 템플릿
+├── loop-engineering.md # act → verify → correct → repeat (교정 루프)
+├── hooks/              # 플러그인 강제 적용: 주입 + 검증 게이트 (+ 테스트)
 ├── integrations/       # 다른 툴용 어댑터
 │   ├── AGENTS.md       # Antigravity · Codex · Aider · Zed · Jules …
 │   └── cursor/fable-workflow.mdc

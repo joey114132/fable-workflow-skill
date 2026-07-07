@@ -20,6 +20,8 @@ it's whether **the human's map matches the territory** before the model starts m
 This skill closes that gap.
 
 > Prompt templates live in `prompts.md` — read it when you need the exact wording.
+> Installed as a Claude Code plugin, optional hooks **enforce** this — a `Stop` verify gate that
+> blocks a groundless "done" (opt-in via `FABLE_STRICT=1`). See `hooks/`.
 
 ## The one idea
 
