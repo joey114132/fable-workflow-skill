@@ -62,15 +62,28 @@ def main():
         elif name == "Bash" and edited_code:
             ran_after_edit = True
 
+    reasons = []
     if edited_code and not ran_after_edit:
-        msg = ("[fable-workflow] Verify gate: code was edited this session but no command ran "
-               "after the last edit — the Verify step wasn't done. Exercise it (run it / smallest "
-               "check) before finishing, or state why verification isn't applicable.")
-        if os.environ.get("FABLE_STRICT") == "1":
-            print(msg, file=sys.stderr)
-            return 2   # block the stop; reason goes back to the model
-        print(msg, file=sys.stderr)  # advisory only
-        return 0
+        reasons.append("code was edited but no command ran after the last edit (Verify step skipped)")
+
+    # Completion gate: an open goals ledger means the task isn't done.
+    ledger = os.path.join(os.getcwd(), ".fable", "goals.json")
+    if os.path.exists(ledger):
+        try:
+            with open(ledger, encoding="utf-8") as f:
+                g = json.load(f)
+            goals = g.get("goals", [])
+            open_goals = [x for x in goals if x.get("status") in ("pending", "active")]
+            if open_goals:
+                reasons.append(f"{len(open_goals)} of {len(goals)} goals in .fable/goals.json are still open (completion gate)")
+        except Exception:
+            pass
+
+    if reasons:
+        msg = ("[fable-workflow] Not done — " + "; ".join(reasons) +
+               ". Verify/finish before stopping, or state why it isn't applicable.")
+        print(msg, file=sys.stderr)
+        return 2 if os.environ.get("FABLE_STRICT") == "1" else 0  # strict blocks; else advisory
     return 0
 
 if __name__ == "__main__":

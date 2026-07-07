@@ -78,6 +78,7 @@ Antigravity는 `.agents/rules/`에 두거나, 전역 규칙은 `~/.gemini/GEMINI
 
 - **`UserPromptSubmit` → 주입** — 비-사소한 작업에서 방법을 컨텍스트에 자동 주입합니다(모델의 자동 발동에 기대지 않는 결정적 활성화).
 - **`Stop` → 검증 게이트** — 세션에서 코드를 고쳤는데 한 번도 실행하지 않았다면 Verify 단계를 건너뛴 것입니다. **기본은 권고(advisory)**, `FABLE_STRICT=1`로 두면 검증 전까지 종료를 **차단**합니다.
+- **완료 게이트** (`scripts/goals.py`) — 다단계 작업을 여러 goal로 분해하고, 각 goal은 **증거(evidence)** 가 있어야만 완료되며, 마지막 goal은 검증 명령과 그 결과 없이는 "완료"를 거부하는 **검증 스토리**입니다. goal이 열려 있는 동안 `Stop` 훅이 종료를 막습니다. [`completion-gate.md`](completion-gate.md) 참고.
 
 이 게이트는 보수적 휴리스틱이라 오작동할 수 있어(예: "원하시면 X 하겠습니다" 같은 선언형) 기본은 권고, 차단은 옵트인입니다. 로직은 `hooks/test_hooks.py`로 검증합니다.
 
@@ -109,7 +110,9 @@ fable-workflow-skill/
 ├── SKILL.md            # 스킬 본체 (그대로 드롭인, 방법론 원본)
 ├── prompts.md          # 복사해서 쓰는 프롬프트 템플릿
 ├── loop-engineering.md # act → verify → correct → repeat (교정 루프)
+├── completion-gate.md  # 멀티 스토리 완료 게이트 (사용법)
 ├── hooks/              # 플러그인 강제 적용: 주입 + 검증 게이트 (+ 테스트)
+├── scripts/goals.py    # 완료 게이트 원장(ledger) + 테스트
 ├── integrations/       # 다른 툴용 어댑터
 │   ├── AGENTS.md       # Antigravity · Codex · Aider · Zed · Jules …
 │   └── cursor/fable-workflow.mdc

@@ -78,6 +78,7 @@ Advice is easy to skip. Installed as a plugin, `fable-workflow` also **enforces*
 
 - **`UserPromptSubmit` → inject** — on a non-trivial task the method is injected into context automatically (deterministic activation, not "hope the model triggers it").
 - **`Stop` → verify gate** — if the session edited code but never ran it, the Verify step was skipped. **Advisory by default**; set `FABLE_STRICT=1` to **block** the stop until it's verified.
+- **Completion gate** (`scripts/goals.py`) — decompose multi-step work into goals; each completes only with **evidence**, and the final goal is a **verification story** that refuses "done" without a verify command + its result. The `Stop` hook blocks stopping while goals stay open. See [`completion-gate.md`](completion-gate.md).
 
 The gate is a conservative heuristic (it can misfire, e.g. on a declarative "I'll do X") — hence advisory-by-default, opt-in strict. Its logic is covered by `hooks/test_hooks.py`.
 
@@ -109,7 +110,9 @@ fable-workflow-skill/
 ├── SKILL.md            # the skill (drop-in, canonical method)
 ├── prompts.md          # copy-paste prompt templates
 ├── loop-engineering.md # act → verify → correct → repeat (correction loop)
+├── completion-gate.md  # multi-story completion gate (usage)
 ├── hooks/              # plugin enforcement: inject + verify gate (+ tests)
+├── scripts/goals.py    # completion-gate ledger + tests
 ├── integrations/       # adapters for other tools
 │   ├── AGENTS.md       # Antigravity · Codex · Aider · Zed · Jules …
 │   └── cursor/fable-workflow.mdc

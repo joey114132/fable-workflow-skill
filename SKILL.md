@@ -22,6 +22,8 @@ This skill closes that gap.
 > Prompt templates live in `prompts.md` — read it when you need the exact wording.
 > Installed as a Claude Code plugin, optional hooks **enforce** this — a `Stop` verify gate that
 > blocks a groundless "done" (opt-in via `FABLE_STRICT=1`). See `hooks/`.
+> Multi-step work → the **completion gate** (`scripts/goals.py`, see `completion-gate.md`)
+> decomposes into goals and refuses a groundless "done".
 
 ## The one idea
 
