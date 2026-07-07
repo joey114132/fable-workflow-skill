@@ -79,18 +79,22 @@ All adapters and per-tool details: [`integrations/`](integrations/).
 
 ## Benchmark
 
-Does the skill actually change model behavior? A small A/B on a deliberately under-specified spec (*"Limit our API to 100 requests per minute"* — which hides ~8 architecture-changing unknowns), run across four models with and without the skill:
+Does the skill actually change model behavior? A small A/B on a deliberately under-specified spec (*"Limit our API to 100 requests per minute"* — which hides ~8 architecture-changing unknowns), run across eight models — cloud and local — with and without the skill:
 
 ![benchmark](benchmark/bench.png)
 
-| Model | No skill | With skill | Δ |
-|---|:---:|:---:|:---:|
-| **Fable 5** | 10 | 10 | 0 |
-| **Opus 4.8** | 9 | 10 | +1 |
-| **Sonnet 5** | 9 | 10 | +1 |
-| **Haiku 4.5** | 4 | 8 | **+4** |
+| Model | Type | No skill | With skill | Δ |
+|---|---|:---:|:---:|:---:|
+| llama3:8b | local | 10 | 60 | **+50** |
+| gemma3:4b | local | 40 | 70 | +30 |
+| **Haiku 4.5** | cloud | 40 | 80 | +40 |
+| qwen2.5:7b | local | 50 | 70 | +20 |
+| qwen3.6 | local | 90 | 100 | +10 |
+| **Sonnet 5** | cloud | 90 | 100 | +10 |
+| **Opus 4.8** | cloud | 90 | 100 | +10 |
+| **Fable 5** | cloud | 100 | 100 | 0 |
 
-**The skill helps most where the model is weakest.** Fable 5 already does this natively (nothing to add); the skill ports that behavior onto cheaper/weaker models — a +4 lift on Haiku.
+Scores are out of 100 (rubric in [RESULTS.md](benchmark/RESULTS.md)). **The lift tracks base weakness** — the weaker a model is unaided, the more the skill helps (llama3:8b +50 → frontier +10 → Fable +0), across both cloud and local models. Fable 5 already does this natively; the skill ports that behavior onto everything else.
 
 Full methodology, rubric, per-model evidence, and limitations: **[benchmark/RESULTS.md](benchmark/RESULTS.md)**.
 

@@ -12,14 +12,20 @@
 
 ![benchmark chart](bench.png)
 
-| Model | No skill | With skill | Δ |
-|---|:---:|:---:|:---:|
-| **Fable 5** | 10 | 10 | 0 |
-| **Opus 4.8** | 9 | 10 | +1 |
-| **Sonnet 5** | 9 | 10 | +1 |
-| **Haiku 4.5** | 4 | 8 | **+4** |
+Scores are out of **100**.
 
-The skill's job — porting Fable 5's native "find-the-unknowns-first" behavior onto other models — shows up cleanly: **biggest lift where the model is weakest** (Haiku +4), **near-zero where the model already does it** (Fable +0, frontier models +1).
+| Model | Type | No skill | With skill | Δ |
+|---|---|:---:|:---:|:---:|
+| llama3:8b | local | 10 | 60 | **+50** |
+| gemma3:4b | local | 40 | 70 | +30 |
+| **Haiku 4.5** | cloud | 40 | 80 | **+40** |
+| qwen2.5:7b | local | 50 | 70 | +20 |
+| qwen3.6 | local | 90 | 100 | +10 |
+| **Sonnet 5** | cloud | 90 | 100 | +10 |
+| **Opus 4.8** | cloud | 90 | 100 | +10 |
+| **Fable 5** | cloud | 100 | 100 | 0 |
+
+The skill's job — porting Fable 5's native "find-the-unknowns-first" behavior onto other models — shows up cleanly, and **the lift tracks base weakness**: the weaker a model is unaided, the more the skill helps (llama3:8b +50 → frontier +10 → Fable +0). This holds across **both cloud and local** models — a strong local reasoning model (qwen3.6) behaves like the frontier (near-ceiling, +10), while weak locals gain the most.
 
 ---
 
@@ -53,42 +59,35 @@ A model that "just codes" picks one interpretation silently. A model applying th
 
 ### Models
 
-Fable 5, Opus 4.8, Sonnet 5, Haiku 4.5 — spawned as identical `general-purpose` subagents, tools available, output capped at ~400 words + code. 4 models × 2 conditions = **8 runs**.
+- **Cloud (Anthropic):** Fable 5, Opus 4.8, Sonnet 5, Haiku 4.5 — spawned as identical `general-purpose` subagents, output capped at ~400 words + code.
+- **Local (ollama, RTX 3080 Ti 16 GB):** qwen3.6, qwen2.5:7b, llama3:8b, gemma3:4b — run via `ollama run` with the identical prompts.
 
-### Rubric (0–10)
+8 models × 2 conditions = **16 runs**. (GLM 5.2 was requested but **not run** — no API key was available in the environment.)
+
+### Rubric (out of 100)
 
 | Dimension | Points | What earns them |
 |---|:---:|---|
-| **Unknowns surfaced** | 0–5 | Count of genuine, distinct, architecture/behavior-changing unknowns raised |
-| **Assumptions logged** | 0–2 | Defaults stated explicitly, each with a reason |
-| **Implementation quality** | 0–3 | Actually enforces 100/min, thread-safe, correct on the window-boundary edge case |
+| **Unknowns surfaced** | 0–50 | Count of genuine, distinct, architecture/behavior-changing unknowns raised |
+| **Assumptions logged** | 0–20 | Defaults stated explicitly, each with a reason |
+| **Implementation quality** | 0–30 | Actually enforces 100/min, thread-safe, correct on the window-boundary edge case |
 
 ---
 
-## Results (with breakdown)
-
-| Model | Condition | Unknowns | U (0–5) | A (0–2) | I (0–3) | **Total** |
-|---|---|:---:|:---:|:---:|:---:|:---:|
-| Fable 5 | no skill | 6 | 5 | 2 | 3 | **10** |
-| Fable 5 | with skill | 9 | 5 | 2 | 3 | **10** |
-| Opus 4.8 | no skill | ~5 | 4 | 2 | 3 | **9** |
-| Opus 4.8 | with skill | 7 | 5 | 2 | 3 | **10** |
-| Sonnet 5 | no skill | ~6 | 4 | 2 | 3 | **9** |
-| Sonnet 5 | with skill | 7 | 5 | 2 | 3 | **10** |
-| Haiku 4.5 | no skill | 2 | 2 | 1 | 1 | **4** |
-| Haiku 4.5 | with skill | 7 | 4 | 2 | 2 | **8** |
-
 ## Per-model evidence
 
-- **Fable 5 is the "native" of this workflow.** *Without* the skill it already surfaced 6 unknowns as a labeled decisions list (including the subtle **clock-source** one), logged every default with a reason, and **actually ran its own self-check** before answering. *With* the skill it went further — flagging the meta-unknown *"this repo has no web API to attach to"* and *"do rejected requests consume tokens?"* (9 unknowns). Nothing to improve on a 10.
+### Cloud
+- **Fable 5 is the "native" of this workflow.** *Without* the skill it already surfaced 6 unknowns as a labeled decisions list (including the subtle **clock-source** one), logged every default with a reason, and **ran its own self-check** before answering. *With* the skill it went further — flagging *"this repo has no web API to attach to"* and *"do rejected requests consume tokens?"* (9 unknowns). Nothing to improve on a perfect 100.
+- **Haiku 4.5 — the clearest cloud win.** *Without* the skill it mislabeled a **fixed-window** counter as a "token bucket" (carrying the 200-request boundary-burst bug) and surfaced only 2 unknowns → **40/100**. *With* the skill: correct sliding window + a 7-row unknowns table → **80/100** (+40).
+- **Opus 4.8 / Sonnet 5 were already near-ceiling.** Both surfaced most unknowns in prose even without the skill (correct sliding-window / token-bucket implementations, `Retry-After`, self-checks). The skill mainly reshaped that reasoning into an explicit, prioritized list (+10 each).
 
-- **Haiku 4.5 — the clearest win.** *Without* the skill it mislabeled a **fixed-window** counter as a "token bucket" (carrying the 200-request boundary-burst bug) and surfaced only 2 unknowns → **4/10**. *With* the skill it produced a correct sliding window and a 7-row unknowns table → **8/10** (+4).
-
-- **Opus 4.8 / Sonnet 5 were already near-ceiling.** Both surfaced most unknowns in prose even without the skill (correct sliding-window / token-bucket implementations, `Retry-After`, self-checks). The skill mainly reshaped that reasoning into an explicit, prioritized list (+1 each).
+### Local (ollama)
+- **qwen3.6 matched the frontier.** This local reasoning model's visible "thinking" trace *already* enumerates unknowns unaided (scope, sliding-vs-fixed window, storage, clock source) → **90** no-skill; with the skill it produced a clean per-IP fixed-window, thread-safe limiter with `Retry-After` and an eviction note → **100** (+10). Same shape as Opus/Sonnet.
+- **Weak locals gained the most — but on the *unknowns* dimension, not the code.** llama3:8b unaided emitted broken code (`dict.keys()[0]` crashes, incoherent threading) and surfaced ~0 unknowns → **10**; with the skill it produced a 3-item UNKNOWNS list with defaults and a coherent counter → **60** (+50). gemma3:4b (**40→70**, +30) and qwen2.5:7b (**50→70**, +20) show the same pattern: the skill reliably adds the *surface-the-unknowns* behavior even when the generated **code still has bugs** (missing `import`, no time window, no lock). So their with-skill gains come from the Unknowns/Assumptions dimensions — **not** implementation quality.
 
 ## Interpretation
 
-The skill is **not** a uniform quality boost. Its measurable effect is concentrated exactly where the theory predicts: models that don't spontaneously "find the unknowns" get the biggest lift. Frontier models mostly already do it; Fable 5 does it by default. So the skill's real value is **leveling up cheaper/weaker models to the frontier's default behavior** on ambiguous specs.
+The skill is **not** a uniform quality boost. Its measurable effect is concentrated exactly where the theory predicts: models that don't spontaneously "find the unknowns" get the biggest lift. Frontier models mostly already do it; Fable 5 does it by default. So the skill's real value is **leveling up weaker models to the frontier's default behavior** on ambiguous specs. The local runs sharpen this: **capability, not vendor, predicts the lift** — a strong local model (qwen3.6) needs the skill as little as a frontier cloud model, while a weak one (llama3:8b) needs it most.
 
 ---
 
@@ -97,8 +96,10 @@ The skill is **not** a uniform quality boost. Its measurable effect is concentra
 Do not over-read these numbers.
 
 - **n = 1 task, single trial, no repeats.** No error bars. Scores are directional.
-- **Self-judged.** Scoring was done by one of the contestant models (Opus 4.8), which is a bias risk — especially for the Opus row.
-- **One-shot autonomous can only test one slice of the skill.** The interactive moves — *interview me*, *blind-spot pass over a real codebase*, *N variants for taste calls*, *quiz-back before merge* — do not fire in a single autonomous shot. The measured gain is only the **surface-the-unknowns** behavior.
+- **Self-judged.** Scoring was done by one of the contestant models (Opus 4.8), a bias risk — especially for the Opus row.
+- **One-shot autonomous can only test one slice of the skill.** The interactive moves — *interview me*, *blind-spot pass over a real codebase*, *N variants*, *quiz-back before merge* — do not fire in a single autonomous shot. The measured gain is only the **surface-the-unknowns** behavior.
+- **Local models: code quality stayed low regardless of the skill.** Their with-skill gains are mostly in *surfacing unknowns*, not working code (missing imports, no time window, crashes). The rubric rewards the former — do **not** read the local with-skill scores as "production-ready output."
+- **GLM 5.2 was not run** — no API key available. Provide a Zhipu / OpenRouter key to add it.
 - **Single task domain** (rate limiting). Results may not transfer to other kinds of ambiguity.
 
 ### To make it robust
@@ -110,7 +111,15 @@ Do not over-read these numbers.
 
 ## Reproduce
 
-For each of {Fable 5, Opus 4.8, Sonnet 5, Haiku 4.5} × {no skill, with skill}, spawn an identical autonomous agent with the task above. For the **with-skill** arm, prepend:
+**Cloud:** for each of {Fable 5, Opus 4.8, Sonnet 5, Haiku 4.5} × {no skill, with skill}, run an identical autonomous agent on the task above.
+**Local:** same two prompts via ollama:
+
+```bash
+ollama run <model> "$(cat prompt_noskill.txt)"      # no-skill arm
+ollama run <model> "$(cat prompt_withskill.txt)"    # with-skill arm
+```
+
+For the **with-skill** arm, the prompt prepends:
 
 ```
 Follow this working method (Fable workflow):
@@ -122,4 +131,4 @@ there is an UNKNOWN — a decision it didn't make. Since you can't ask me:
 3) THEN implement, matching your defaults.
 ```
 
-Score each output with the rubric above. (Prefer a judge model that is *not* one of the models under test.)
+Score each output with the rubric above (out of 100). Prefer a judge model that is *not* one of the models under test.
