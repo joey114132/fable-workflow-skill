@@ -9,16 +9,7 @@ description: >
   unfamiliar, or the model would otherwise guess at things you never specified. Trigger on:
   "blind spot pass", "find my unknowns", "interview me", "give me N variants / options",
   underspecified specs, new-domain exploration, or "log your assumptions".
-allowed_tools:
-  - Read
-  - Grep
-  - Glob
-  - Bash
-  - Write
-  - Edit
-  - WebSearch
-  - WebFetch
-  - AskUserQuestion
+allowed_tools: [Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch, AskUserQuestion]
 ---
 
 # Fable Workflow
