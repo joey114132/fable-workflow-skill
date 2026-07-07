@@ -14,6 +14,19 @@ import sys, json, os
 CODE_EXT = (".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java", ".rb",
             ".c", ".cc", ".cpp", ".h", ".sh", ".kt", ".swift", ".php", ".lua")
 
+def _firelog(name):
+    """Record a firing if env FABLE_HOOK_LOG is set (opt-in debug; off by default)."""
+    path = os.environ.get("FABLE_HOOK_LOG")
+    if not path:
+        return
+    try:
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        from datetime import datetime, timezone
+        with open(path, "a") as f:
+            f.write(datetime.now(timezone.utc).isoformat(timespec="seconds") + f" {name} fired\n")
+    except Exception:
+        pass
+
 def walk_tools(obj, out):
     """Recursively collect (tool_name, input_dict) in document order — tolerant of schema."""
     if isinstance(obj, dict):
@@ -27,6 +40,7 @@ def walk_tools(obj, out):
             walk_tools(v, out)
 
 def main():
+    _firelog("Stop/verify_gate")
     try:
         data = json.load(sys.stdin)
     except Exception:

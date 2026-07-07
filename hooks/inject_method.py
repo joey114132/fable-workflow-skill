@@ -2,8 +2,22 @@
 """UserPromptSubmit hook — inject ONLY the smallest matching discipline on a non-trivial task
 (token-lean: one short line, not a fixed blob; task-matched like fablize's router). Trivial
 prompts and plain questions get nothing. stdout is added to context; exit 0 always.
+
+Set env FABLE_HOOK_LOG=<path> to record each firing (opt-in debug; off by default).
 """
-import sys, json, re
+import sys, json, re, os
+
+def _firelog(name):
+    path = os.environ.get("FABLE_HOOK_LOG")
+    if not path:
+        return
+    try:
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        from datetime import datetime, timezone
+        with open(path, "a") as f:
+            f.write(datetime.now(timezone.utc).isoformat(timespec="seconds") + f" {name} fired\n")
+    except Exception:
+        pass
 
 def discipline(low):
     """Return the single most-relevant one-liner for this task (smallest matching discipline)."""
@@ -16,6 +30,7 @@ def discipline(low):
     return "surface the UNKNOWNS this leaves open (sensible defaults if you can't ask), then build and verify."
 
 def main():
+    _firelog("UserPromptSubmit/inject_method")
     try:
         data = json.load(sys.stdin)
     except Exception:
