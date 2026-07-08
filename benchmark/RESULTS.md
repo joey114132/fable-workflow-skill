@@ -116,6 +116,37 @@ I re-ran the four local models (same task, same rubric). Scores swung hard betwe
 
 ---
 
+## Independent reproduction — local, 2026-07-08 (n=1)
+
+A further single-trial run of the **local** arm on separate hardware, following the
+[Reproduce](#reproduce) steps verbatim — same task, same two prompts, same /100 rubric.
+Judge: Opus 4.8 (same self-judge caveat as above). One draw per cell, so **every Δ here is
+noise-dominated** per the warning directly above — this is one more data point toward the
+"run 3–5 trials" goal, not a verdict. Reported in full, including the two cells that landed
+*lower* than the headline run.
+
+| Model | Think (no→with) | Answer (no→with) | **Total (no→with)** | Δ |
+|---|:---:|:---:|:---:|:---:|
+| llama3:8b | 2 → 17 | 6 → 15 | **8 → 32** | +24 |
+| gemma3:4b | 15 → 24 | 36 → 37 | **51 → 61** | +10 |
+| qwen2.5:7b | 8 → 22 | 18 → 4 | **26 → 26** | 0 |
+| qwen3.6 | 40 → 32 | 50 → 43 | **90 → 75** | −15 |
+
+**Confirms the core asymmetry.** Thinking rose for the three weak/mid models (+15, +9, +14);
+Answer only rose where the model could already code the plan (llama3 +9, gemma3 +1) and fell
+where it couldn't (qwen2.5 −14, shipping a misused external lib after reasoning more).
+llama3's no-skill total landed on **8** — identical to Trial 1's, an independent match on a
+model that, unaided, writes a counter that never limits.
+
+**Diverges on qwen3.6** (90 → 75, Δ −15). Its *Thinking* dipped rather than rising: with the
+skill it reasoned itself from a correct **sliding** window into a simpler **fixed** window —
+reintroducing the boundary-burst bug and dropping the multi-worker note it made unaided, so
+it stopped reasoning about those edges. Same mechanism the n=2 table flags for the strongest
+local model ("picks a simpler fixed-window… nothing to gain"), landing on the negative side of
+its variance envelope this draw.
+
+---
+
 ## Limitations
 
 - **n = 1 for cloud; n = 2 for local (see reproducibility above).** Local Δs swing wildly run-to-run (gemma3:4b: −12 then +42), **confirming** single-trial numbers are mostly noise. Treat any single Δ — cloud or local — as directional only; real conclusions need n ≥ 3.
