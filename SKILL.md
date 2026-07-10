@@ -24,6 +24,11 @@ This skill closes that gap.
 > blocks a groundless "done" (opt-in via `FABLE_STRICT=1`). See `hooks/`.
 > Multi-step work → the **completion gate** (`scripts/goals.py`, see `completion-gate.md`)
 > decomposes into goals and refuses a groundless "done".
+> Per-ANSWER discipline — claim tiers, number re-derivation, self-attack, completeness maps,
+> the fake-competence tells, and the send gate — lives in `standing-orders.md`. The loop below
+> governs how you run a *task*; the standing orders govern every *answer*, trivial or not.
+> Outside an explicitly invoked interview/blind-spot phase, question escalation follows
+> standing-orders §1 (one question, three-condition test).
 
 ## The one idea
 

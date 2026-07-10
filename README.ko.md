@@ -108,6 +108,7 @@ Antigravity는 `.agents/rules/`에 두거나, 전역 규칙은 `~/.gemini/GEMINI
 ```
 fable-workflow-skill/
 ├── SKILL.md            # 스킬 본체 (그대로 드롭인, 방법론 원본)
+├── standing-orders.md  # 답변마다 지키는 규율 + 발신 전 게이트
 ├── prompts.md          # 복사해서 쓰는 프롬프트 템플릿
 ├── loop-engineering.md # act → verify → correct → repeat (교정 루프)
 ├── completion-gate.md  # 멀티 스토리 완료 게이트 (사용법)

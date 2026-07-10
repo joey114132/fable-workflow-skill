@@ -108,6 +108,7 @@ Full methodology, rubric, per-model evidence, and limitations: **[benchmark/RESU
 ```
 fable-workflow-skill/
 ├── SKILL.md            # the skill (drop-in, canonical method)
+├── standing-orders.md  # per-answer discipline + pre-send gate
 ├── prompts.md          # copy-paste prompt templates
 ├── loop-engineering.md # act → verify → correct → repeat (correction loop)
 ├── completion-gate.md  # multi-story completion gate (usage)
