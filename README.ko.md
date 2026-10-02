@@ -136,6 +136,8 @@ claude plugin eval . --no-publish --allow-tools WebSearch WebFetch   # evidence 
 
 결과는 `evals/results/`에 쌓입니다(gitignore). Bash는 `socat` 없이는 허용할 수 없어서 "돌려서 검증하기" 행동은 이 스위트가 다루지 못합니다. 통과시키려고 케이스를 고치지 마세요.
 
+첫 실행(2026-10-02, 케이스와 arm마다 한 번)에서는 플러그인을 켠 상태로 7개 중 4개가 통과했습니다. 첫 데이터일 뿐이며 [benchmark/RESULTS.md](benchmark/RESULTS.md#first-claude-plugin-eval-run-2026-10-02-plugin-110)에 정리했습니다.
+
 ## 벤치마크
 
 이 스킬이 실제로 모델의 행동을 바꿀까요?
@@ -159,11 +161,11 @@ claude plugin eval . --no-publish --allow-tools WebSearch WebFetch   # evidence 
 | gemma3:4b | local | 50 | 38 | **−12** |
 | **Haiku 4.5** | cloud | 66 | 81 | **+15** |
 | qwen3.6 | local | 82 | 87 | +5 |
+| Sonnet 5.5 (2026-10-02 재실행) | cloud | 90 | 91 | +1 |
 | **Sonnet 5** | cloud | 91 | 98 | +7 |
+| Opus 5.5 (2026-10-02 재실행) | cloud | 93 | 95 | +2 |
 | **Opus 4.8** | cloud | 95 | 98 | +3 |
 | **Fable 5** | cloud | 96 | 100 | +4 |
-| **Sonnet 5.5** (2026-10-02) | cloud | 90 | 91 | +1 |
-| **Opus 5.5** (2026-10-02) | cloud | 93 | 95 | +2 |
 
 **답변과 사고 품질**을 100점 만점으로, Thinking /50 + Answer /50로 나눠 채점했습니다([상세 기준과 세부 점수](benchmark/RESULTS.md)).
 
@@ -173,9 +175,15 @@ claude plugin eval . --no-publish --allow-tools WebSearch WebFetch   # evidence 
 
 총점 향상이 가장 큰 쪽은 "능력은 있으나 덜 추론하던" 모델입니다(llama3:8b +19, Haiku 4.5 +15). Fable 5는 도움 없이도 **96점**이었습니다.
 
-방향을 보는 파일럿으로 읽어 주세요. 클라우드 행은 모두 단일 시행입니다. 7월 행은 Opus 4.8이 직접 채점했습니다.
+방향을 보는 파일럿으로 읽어 주세요. 7월 클라우드 행은 단일 시행이고 Opus 4.8이 직접 채점했습니다. Opus 5.5와 Sonnet 5.5 행은 2026-10-02에 한 번씩 돌린 값입니다.
 
-7월에 측정한 클라우드 모델 가운데 Haiku 4.5를 뺀 셋(Fable 5, Opus 4.8, Sonnet 5)은 이제 legacy입니다. 2026-10-02에 같은 과제를 Opus 5.5와 Sonnet 5.5로 다시 돌렸습니다. 이번에는 단순한 `claude -p` 호출로 답을 받았고, 시험 대상이 아닌 모델이 네 답을 가린 채 채점했습니다. 두 모델 모두 1~2점 움직였는데 단일 시행의 잡음 범위입니다. 지금 모델은 이 unknown 대부분을 스스로 짚기 때문입니다. Fable 5.1은 다시 돌리지 않았습니다.
+채점은 이 두 모델이 아닌 Opus 4.8이 모델 이름을 가린 채 했습니다. 두 모델 모두 스킬 없이도 90점 이상이라 스킬이 더할 여지가 작았습니다.
+
+클라우드 실행은 2026년 7월에 했습니다. 측정한 클라우드 모델 네 개 중 셋(Fable 5, Opus 4.8, Sonnet 5)은 이제 legacy이고 채점자인 Opus 4.8도 마찬가지입니다.
+
+2026-10-02 기준 현재 라인업은 Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 4.5입니다. Opus 5.5와 Sonnet 5.5는 2026-10-02에 한 번씩 다시 돌렸습니다.
+
+하네스가 7월과 달라서 직접 비교는 안 됩니다([benchmark/RESULTS.md](benchmark/RESULTS.md)의 재실행 절). Haiku 4.5는 7월 값 그대로이고 Fable 5.1은 측정하지 않았습니다.
 
 [`evals/`](#evals) 스위트가 재현 가능한 대체물입니다. 짧은 프롬프트가 아니라 실제 배포되는 플러그인을 시험하기 때문입니다.
 

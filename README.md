@@ -126,6 +126,8 @@ Each case runs with and without the plugin (a baseline arm), and the harness doe
 
 Bash cannot be granted without `socat`, so the suite does not cover the "run it to verify" behavior. Don't edit a case to make it pass.
 
+The first run (2026-10-02, one run per case and arm) passed 4 of 7 cases with the plugin. It is a first data point, described in [benchmark/RESULTS.md](benchmark/RESULTS.md#first-claude-plugin-eval-run-2026-10-02-plugin-110).
+
 ## Benchmark
 
 Does the skill actually change model behavior? A small A/B on a deliberately under-specified spec (*"Users shouldn't be able to spam our API. Limit it to 100 requests per minute."*, which hides about 8 architecture-changing unknowns), run across eight models (cloud and local) with and without a short one-shot prompt that states the skill's core move: list the unknowns with defaults, then implement (see "Reproduce" in [`benchmark/RESULTS.md`](benchmark/RESULTS.md)). The prompt is not the full `SKILL.md` and the hooks were not active.
@@ -139,11 +141,11 @@ Does the skill actually change model behavior? A small A/B on a deliberately und
 | gemma3:4b | local | 50 | 38 | **−12** |
 | **Haiku 4.5** | cloud | 66 | 81 | **+15** |
 | qwen3.6 | local | 82 | 87 | +5 |
+| Sonnet 5.5 (re-run 2026-10-02) | cloud | 90 | 91 | +1 |
 | **Sonnet 5** | cloud | 91 | 98 | +7 |
+| Opus 5.5 (re-run 2026-10-02) | cloud | 93 | 95 | +2 |
 | **Opus 4.8** | cloud | 95 | 98 | +3 |
 | **Fable 5** | cloud | 96 | 100 | +4 |
-| **Sonnet 5.5** (2026-10-02) | cloud | 90 | 91 | +1 |
-| **Opus 5.5** (2026-10-02) | cloud | 93 | 95 | +2 |
 
 Scored on **answer + thinking quality** out of 100, split Thinking /50 + Answer /50 ([detailed rubric and sub-scores](benchmark/RESULTS.md)). In the headline run the skill improved the models' reasoning more than their code. *Thinking* quality rose for every model (+2 to +18), but *answer* quality only improves when the model can already code the plan, and it was flat or negative for weak locals.
 
@@ -151,9 +153,9 @@ The local re-runs show how noisy single draws are. gemma3 swung from −12 to +4
 
 Biggest total gains were on capable-but-under-reasoning models (llama3:8b +19, Haiku 4.5 +15). Fable 5 scored **96 unaided**.
 
-Read the numbers as a directional pilot. Every cloud row is a single trial. The July rows were self-judged by Opus 4.8.
+Read the numbers as a directional pilot. The July cloud rows are single-trial and were self-judged by Opus 4.8. The Opus 5.5 and Sonnet 5.5 rows are single draws from 2026-10-02, judged blind by Opus 4.8, which is not one of those two models. Both models score 90 or more unaided, so the skill had little room to add.
 
-The July cloud models other than Haiku 4.5 (Fable 5, Opus 4.8, Sonnet 5) are now legacy. On 2026-10-02 the same task was re-run on Opus 5.5 and Sonnet 5.5 with a bare `claude -p` call, and a model that was not under test scored the four answers blind. Both moved by one or two points, which is inside single-trial noise: current models already surface most of these unknowns on their own. Fable 5.1 was not re-run.
+The cloud runs were made in July 2026. Three of the four cloud models they measured (Fable 5, Opus 4.8, Sonnet 5) are now legacy, and so is the Opus 4.8 judge. As of 2026-10-02 the current lineup is Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 4.5. Opus 5.5 and Sonnet 5.5 were re-run once on 2026-10-02, with a different harness from July (see the re-run section of [benchmark/RESULTS.md](benchmark/RESULTS.md)). Haiku 4.5 is still the July row, and Fable 5.1 was not measured.
 
 The [`evals/`](#evals) suite is the reproducible replacement, because it tests the shipped plugin instead of a short prompt.
 

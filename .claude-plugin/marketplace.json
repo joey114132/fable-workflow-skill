@@ -9,7 +9,7 @@
       "name": "fable-workflow",
       "source": "./",
       "description": "Fable-style agentic working method for any model — surface the unknowns before building on vague specs or unfamiliar code.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "Jeongwoo (Joey Lee)"
       }

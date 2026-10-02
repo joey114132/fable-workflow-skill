@@ -1,7 +1,7 @@
 {
   "name": "fable-workflow",
   "description": "Fable-style agentic working method for any model — surface the unknowns before building on vague specs or unfamiliar code (blind-spot pass, interview, variants, log assumptions, stay in the loop).",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Jeongwoo (Joey Lee)"
   },
