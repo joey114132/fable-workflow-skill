@@ -28,15 +28,23 @@ New-domain variant:
 > It may be a different language/system. **Read it, understand the intent, then build
 > {target}** in that spirit. Ask only if the intent is ambiguous.
 
+## Check first (before the first edit)
+> Before you change anything, write down the check that decides "done": the exact command and
+> what pass and fail look like. For a bug, reproduce it with a failing check first. If nothing
+> runnable exists, say so and mark the result Likely. Stay inside this request; list anything
+> else you notice as a follow-up instead of fixing it.
+
 ## Log deviations (during build)
 > While you build, keep a running **ASSUMPTIONS / IMPLEMENTATION NOTES** list: every time
 > you hit something my spec didn't cover (an unknown), record it and the choice you made.
-> Show the list with the result.
+> In a long session keep the list in a notes file so it survives compaction. Show it with the result.
 
 ## Verify — make it real (before you call it done)
 > Don't assert it works — **exercise it.** Code: run it, or write the smallest check that fails
-> if the logic breaks, and show the output. Research/analysis: verify the key claim against a
-> source. Design/doc: put it in the real context and show how it holds up.
+> if the logic breaks, and show the output. For a bug fix, show that check failing on the
+> unfixed code first, then passing. Research/analysis: verify the key claim against a source.
+> Design/doc: put it in the real context and show how it holds up. A subagent's or tool's
+> "done" is a claim: re-run it or read the diff before you repeat it.
 
 ## Correction loop (when verify fails)
 > Don't retry blindly. Each attempt: state ONE hypothesis for *why* it failed, change only that,
@@ -49,15 +57,20 @@ New-domain variant:
 
 ## One-shot / autonomous (can't ask back)
 > You can't ask me questions on this run. So first write an **UNKNOWNS** list (the decision
-> points my spec left open), pick a sensible default for each **and say why**, THEN implement.
-> Surface the unknowns even though you're proceeding without me.
+> points my spec left open), pick the **conservative** default for each (reversible, smallest
+> blast radius) **and say why**, THEN implement. Anything irreversible or external (delete,
+> overwrite, push, send, spend, shared hardware): don't default it. Leave it undone and list it
+> as "needs your decision" with the command to run. Surface the unknowns even though you're
+> proceeding without me.
 
-## Small / local models (≤ ~8B)
+## Small / local models (about 8B and under)
 
-A weak model spends its limited capacity on the process and then botches the code — asking a
-4B model to *derive* an implementation while also producing a full unknowns list makes the code
-**worse**, not better (verified: gemma3:4b inverts the logic). Fix: cap the analysis and use the
-**references-as-maps** move — have it *adapt a known-good reference* instead of deriving.
+A weak model spends its limited capacity on the process and can then botch the code. In one
+benchmark run gemma3:4b, asked to *derive* an implementation while also producing a full
+unknowns list, inverted the logic (commit 3b4a763). Its later runs scored higher with the pilot's
+one-shot unknowns prompt (18→60, 51→61 in `benchmark/RESULTS.md`), so treat this as a risk to watch, not a rule.
+If a small model's code gets worse, cap the analysis and use the **references-as-maps** move:
+have it *adapt a known-good reference* instead of deriving.
 
 > You're building a small feature and CANNOT ask questions. Keep it short.
 > STEP 1 — list only the **2–3 most important** open decisions, each with a one-line default.
@@ -71,5 +84,6 @@ A weak model spends its limited capacity on the process and then botches the cod
 >
 > TASK: {your task + spec}
 
-No reference handy? Prefer a stronger local model — per the benchmark, a reasoning model
-(qwen3.6) handled the full method fine (82→87), while gemma3:4b needed this variant.
+No reference handy? Try a stronger local model, but the benchmark gives no safe size. The
+reasoning model qwen3.6 went 82→87 in one run and 82→70 and 90→75 in two later ones. Every cell
+is a single self-judged draw, so check the code itself, not the score.

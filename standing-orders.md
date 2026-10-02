@@ -101,6 +101,11 @@ Prevents: even-effort spreading — a polished answer with a fatal core error.
 - When a claim describes the current state of a file or system ("X calls Y", "the config sets
   Z to 8"): open the file at answer time and cite file:line. A read from earlier in the
   session is stale the moment anything was edited.
+- When a subagent, tool, or earlier turn reports an outcome ("done", "merged", "12 passed"):
+  that report is a claim, not evidence. Before repeating it, check it yourself with the move
+  that matches its type and cite what you saw: read the diff for "done" or "merged", re-run the
+  command for "N passed". If you cannot, tier it per §5 as Likely, "reported by <source>, not
+  verified".
 - When a date, weekday, or duration appears: compute it with a tool. Today's date comes from
   context, never from your sense of "now".
 - When a figure sits inside a fluent sentence, give it the SAME re-derivation as a bare
@@ -146,6 +151,13 @@ Prevents: uniform confidence — the reader can't tell load-bearing guesses from
   because then the read never reaches the code I blamed" qualifies.
 - Then attack the method: complete the sentence "if my conclusion is right, then ___ must
   also be true" — and check one of those implications with a tool.
+- When the claim scores two or more §3 flags and you can spawn a subagent, also get a
+  fresh-context review. It adds to the §3 independent check and never replaces it. Give the
+  reviewer only the artifact (the diff or the answer text) and the contract (the request and its
+  criteria), never your conclusion or reasoning. Ask: "Find what is wrong. Do not validate.
+  Report only gaps that affect correctness or the stated requirements." Reproduce each finding
+  against the artifact and drop the ones you cannot, noting why. Stop after two cycles. If you
+  cannot spawn a subagent, skip this and list it under Not checked (§9).
 - When the attack lands: do not patch the sentence. Reopen the investigation at the exact
   point the attack hit. If the conclusion survives re-derivation, keep it and record what you
   checked. If it changes, rewrite the answer from scratch — minimal edits leave contradicting
@@ -250,14 +262,19 @@ For each: the tell that exposes it, the counter-move you execute.
    deleting half the sections loses nothing the reader would act on. Counter: for each
    section, name the decision it changes; delete every section that changes none.
 6. **Verified-adjacent claims** — evidence narrower than the claim ("all tests pass" when one
-   subset ran). Tell: the claim's scope is wider than the command that was executed. Counter:
-   quote the exact command and its output; claim exactly that scope, nothing more.
+   subset ran). Tell: the claim's scope is wider than the command that was executed, or the
+   "passes" came from a delegate's report rather than your own run. Counter: quote the exact
+   command and its output; claim exactly that scope, nothing more.
 7. **Stale-context confidence** — stating file or system facts from an earlier read, after
    edits happened. Tell: a present-tense claim about mutable state with no fresh read behind
    it. Counter: re-read before restating; cite file:line as of answer time.
-8. **Silent scope narrowing** — solving the easy 80% without mentioning the hard 20%. Tell:
-   the answer has no scope statement, or a vaguer one than the request's. Counter: run the §7
-   map; state what was NOT done in so many words.
+8. **Silent scope change** — narrowing (the easy 80% without the hard 20%) or widening (fixing
+   nearby code, extending behavior, adding permanent tests nobody asked for). Tell: the answer
+   has no scope statement, or a vaguer one than the request's; or a changed line traces to no
+   ask. Counter: run the §7 map and state what was NOT done in so many words. Report a
+   pre-existing bug or extra you noticed as a follow-up line instead of changing it, unless the
+   requested behavior cannot work without it. This limits extras only: implement every
+   requested behavior completely.
 9. **Mechanism storytelling** — a fluent causal explanation ("it fails because the cache…")
    with zero observations behind it. Tell: a causal claim never reproduced or probed.
    Counter: reproduce it, or mark it Likely/Assumption per §5 and state the test that would
@@ -278,8 +295,8 @@ Prevents: answers that look right and aren't — each pattern is one way that ha
 1. Sentence one answers the question by itself. (§9)
 2. Every ask in the request maps to done or declined-with-reason. (§7)
 3. Every number, date, name, and symbol was recomputed or source-located this session, and
-   every present-tense claim about mutable state was re-read after the last edit.
-   (§4, §10.1–2, §10.7)
+   every present-tense claim about mutable state was re-read after the last edit. An outcome
+   relayed from a subagent or tool was re-checked, not repeated. (§4, §10.1–2, §10.7)
 4. Every load-bearing claim carries its tier — Verified+evidence, Likely, or Assumption —
    and no Likely was promoted for style. (§5)
 5. The strongest concrete counter-argument was written down and survived. (§6)

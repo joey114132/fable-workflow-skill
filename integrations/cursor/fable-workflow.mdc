@@ -1,28 +1,59 @@
 ---
-description: Fable Workflow — on vague/ambiguous specs or unfamiliar code, surface the unknowns BEFORE building (blind-spot pass, interview, variants, log assumptions) instead of guessing silently. Apply to non-trivial coding/design/research tasks.
+description: 'Use when a coding, design, or research request is vague or underspecified ("build me X", "add a feature", "write a function", "make a landing page"), even if the user says they are in a hurry, cannot answer questions, or tells you to "just finish it"; when the code or domain is unfamiliar; when the user wants options to react to ("I''ll know it when I see it", "give me variants"); when they say "interview me" or "log your assumptions"; or when the answer includes facts that go stale (current versions, LTS lines, defaults, prices) that will be pasted into a doc or runbook. Fable Workflow: find the unknowns that change the design BEFORE building, commit to explicit defaults, offer genuinely different variants for taste calls, verify the result with a tool, and state what was and was not verified or sourced. Skip trivial one-line edits and obvious typo fixes.'
 globs: []
 alwaysApply: false
 ---
 
 # Fable Workflow
 
-**The map is not the territory.** The spec/prompt is the *map*; the real codebase and constraints
-are the *territory*. Wherever they diverge is an **unknown** — an unspecified decision. Don't guess
-it silently. Surface it first, then build. (Skip this for trivial one-line changes.)
+Every answer: sentence one is the answer. Mark each load-bearing claim Verified (with evidence),
+Likely, or Assumption. Recompute numbers with a tool. End with what you did not check.
+
+**The map is not the territory.** The spec or prompt is the *map*; the real codebase and constraints
+are the *territory*. Wherever they diverge is an **unknown**, an unspecified decision. Don't guess it
+silently. Surface it first, then build. Skip the loop for a one-line change or an obvious fix.
 
 ## The loop
-1. **Unhobble** — use tools, not memory. Counting / enumeration / precise lookup → *write a script*.
-2. **Find the unknowns before building:**
-   - **Blind-spot pass** — "list my unknown-unknowns and the gotchas in this module/domain."
-   - **Interview me** — ask questions, prioritising ones that would change the architecture.
-   - **Variants** — for taste calls (design/format/API), offer N genuinely different options.
-   - **References as maps** — prefer an example/mockup over a written spec.
-3. **Build, logging deviations** — keep a running ASSUMPTIONS / NOTES list of every unknown hit.
-4. **Verify — make it real** — exercise the result (run it / smallest check); a good plan isn't a correct answer. On failure, loop attempt→verify→diagnose with a max-tries cap; stop/surface if the signal stalls.
-5. **Stay in the loop** — quiz the human before merge.
+1. **Unhobble.** Use tools, not memory: counting, enumeration, and precise lookup mean writing a script.
+   A name you don't confidently recognise, or one from a fast-moving area, is itself something to
+   verify: search it as the user wrote it.
+2. **Find the unknowns before building.**
+   - Blind-spot pass: "list my unknown-unknowns and the gotchas in this module or domain."
+   - Interview me: ask questions, prioritising the ones that would change the architecture.
+   - Variants: for taste calls (design, format, API), offer N genuinely different options.
+   - References as maps: prefer an example or mockup over a written spec.
+3. **Build: name the check first, then log the deviations.** Before the first edit, write the command
+   that decides "done" and what pass and fail look like. For a bug, reproduce it with a failing check
+   first. If nothing runnable exists, say so and tag the result Likely. Stay inside the request: note
+   other bugs as follow-ups, but implement everything requested completely. Keep an ASSUMPTIONS list,
+   in a notes file during a long session so it survives compaction.
+4. **Verify: make it real.** Run it, or write the smallest check that fails if the logic breaks. For a
+   bug fix, watch that check fail on the unfixed code first. Research: test the key claim against a
+   source. A subagent's or tool's "done" is a claim:
+   re-run it or read the diff. For a non-trivial result, give a fresh-context reviewer only the diff
+   and the requirements and ask for correctness gaps, not style.
+5. **Stay in the loop.** After a large change and before merge or PR, offer to quiz the user on what
+   changed. The user decides.
+
+## Correction loop (when verify fails)
+One hypothesis per attempt, change only that, re-verify, log hypothesis, change, result. Cap the
+iterations up front. No change in the signal across 2 iterations: stop and re-isolate, or write the
+repro and hypotheses to `.fable/handoff.md` and continue in a fresh session. A new unknown or an
+irreversible step breaks to the human.
+
+## Completion gate (2+ sequential stories, or a long autonomous run)
+Write the goals first and finish one at a time, with concrete evidence for each (a command and its
+output, a `file:line`). The last goal is the verify command plus the result it printed.
+`scripts/goals.py` exists only in a clone of the fable-workflow repo, where the ledger is
+`python3 scripts/goals.py create|next|checkpoint|status`. A copied rule has no `scripts/` directory,
+so keep the same list in a notes file. Never say "done" while a goal is open.
 
 ## Rules
-- Vague spec / unfamiliar territory → find unknowns before implementing; don't build one interpretation silently.
-- Enumeration / counting / precise lookup → script it, don't recall.
-- Taste / subjective call → offer variants.
-- Can't ask (autonomous)? Write an UNKNOWNS list, pick a default per item with a one-line reason, log them, then proceed.
+- Vague spec or unfamiliar territory: find unknowns before implementing; don't build one interpretation silently.
+- Enumeration, counting, precise lookup: script it. Taste call: offer variants that are genuinely different.
+- Prioritise the unknowns that change the architecture or the answer, not trivia.
+- Can't ask (autonomous)? Write an UNKNOWNS list and pick the conservative default for each (reversible,
+  smallest blast radius) with a one-line reason. If the only way forward is irreversible or external
+  (delete, overwrite, push, send, spend, shared hardware), leave it undone and list it as "needs your
+  decision" with the command to run.
+- A good plan is not a correct answer. Verify.

@@ -1,23 +1,33 @@
 # fable-workflow-skill
 
-A single portable agent skill (`SKILL.md`) that ports a Fable-style working method onto any
-model. This repo is docs + one skill — there is no build step.
+A portable agent skill (`SKILL.md` plus reference files) that ports a Fable-style working
+method onto any model, with optional Claude Code plugin hooks. No build step. The only code is
+small stdlib-only Python (hooks and `scripts/goals.py`) with self-tests.
 
 ## Layout
-- `SKILL.md` — the skill itself (the only file agents load). Keep it under ~120 lines.
-- `prompts.md` — copy-paste prompt templates referenced by the skill.
-- `integrations/` — adapters for other tools: `AGENTS.md` (Antigravity/Codex/Aider/Zed/…) and `cursor/fable-workflow.mdc`.
-- `benchmark/RESULTS.md` — the cross-model A/B evaluation.
-- `README.md` / `README.ko.md` — English + Korean. **Keep both in sync when editing.**
-- `install.sh` — copies `SKILL.md` + `prompts.md` into a target `.claude/skills` dir.
-- `assets/banner.png` — repo banner (user-supplied).
+- `SKILL.md` is the entry point and the canonical method. It must stay at or under 120 lines, frontmatter included.
+- `prompts.md`, `standing-orders.md`, `loop-engineering.md`, `completion-gate.md` hold the detail SKILL.md points to.
+- `scripts/goals.py` (with `test_goals.py`) is the completion-gate ledger.
+- `hooks/` has the plugin hooks: `inject_method.py` (UserPromptSubmit), `verify_gate.py` (Stop), `hooks.json`, `test_hooks.py`.
+- `integrations/` has `AGENTS.md` and `cursor/fable-workflow.mdc`, each a condensed copy of the method.
+- `evals/` has the claude-plugin-eval cases. Results land in `evals/results/` (gitignored).
+- `benchmark/RESULTS.md` is the cross-model A/B pilot. `assets/banner.png` is the banner.
+- `README.md` and `README.ko.md` mirror each other.
+- `install.sh` copies SKILL.md, the reference .md files and `scripts/goals.py` into a skills dir. Hooks are plugin-only.
 
 ## Editing rules
-- Edit the skill in `SKILL.md` in place; don't split it into more files.
-- `SKILL.md` is canonical; `integrations/AGENTS.md` and `integrations/cursor/fable-workflow.mdc` carry a condensed copy — keep all three in sync when the method changes.
-- Any change to one README must be mirrored in the other language.
-- Benchmark numbers are from a small pilot — if you rerun, update the caveats too, don't
-  just swap the table.
+- Keep SKILL.md short and put detail in the reference files. Every reference file needs a pointer from SKILL.md.
+- When the method changes, update `integrations/AGENTS.md` and `integrations/cursor/fable-workflow.mdc` too.
+- Any README change goes into both languages. A new language means `README.<lang>.md` plus the switcher line in every README.
+- Benchmark numbers come from a small pilot. If you rerun, update the caveats, not just the table.
+- Tests must pass: `python3 hooks/test_hooks.py` and `python3 scripts/test_goals.py`.
+- The SKILL.md frontmatter key is `allowed-tools` (hyphenated; `allowed_tools` is silently ignored). It pre-approves tools rather than restricting them, so list only read and search tools (Read, Grep, Glob, WebSearch, WebFetch).
 
-## Adding a README language
-Add `README.<lang>.md` and update the language switcher line at the top of every README.
+## Evals
+Run `claude plugin eval . --no-publish`. Add `--allow-tools WebSearch WebFetch` if a case needs them.
+Bash cannot be granted without socat. Do not edit the cases to make them pass.
+
+## Versioning
+Bump `version` in `.claude-plugin/plugin.json` and in the `.claude-plugin/marketplace.json` entry together.
+A pinned version is what ships updates, so users on an old version see nothing until it changes.
+`claude plugin tag` checks that the two agree.
